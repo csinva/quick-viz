@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quick Quiz</title>
+<script>
+  // Apply theme before paint to avoid a flash.
+  (function () {
+    var t = localStorage.getItem('quiz-theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #fafaf7;
+    --panel: #ffffff;
+    --border: #e3e3dc;
+    --text: #1d1d1b;
+    --muted: #777;
+    --accent: #1f6feb;
+    --pill: #f1f1ea;
+    --shadow: rgba(31,111,235,0.10);
+    --custom-bg: #ffffff;
+  }
+  [data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0f1419;
+    --panel: #1a1f26;
+    --border: #2d343f;
+    --text: #e8e8e6;
+    --muted: #8b9098;
+    --accent: #4d8df0;
+    --pill: #262d36;
+    --shadow: rgba(77,141,240,0.20);
+    --custom-bg: #1a1f26;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
+  header { display: flex; align-items: center; padding: 0.9rem 1.2rem; border-bottom: 1px solid var(--border); background: var(--panel); }
+  header h1 { font-size: 1.1rem; margin: 0; font-weight: 600; flex: 1; }
+  #theme-btn { font: inherit; padding: 0.35rem 0.65rem; border: 1px solid var(--border); background: var(--panel); border-radius: 6px; cursor: pointer; color: var(--text); }
+  #theme-btn:hover { background: var(--pill); }
+
+  main { max-width: 980px; margin: 0 auto; padding: 2.4rem 1.2rem 4rem; }
+  .hero { margin-bottom: 2rem; }
+  .hero h2 { font-size: 2rem; margin: 0 0 0.4rem; letter-spacing: -0.01em; }
+  .hero p { color: var(--muted); margin: 0; font-size: 1.05rem; max-width: 56ch; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+  .card { display: flex; flex-direction: column; padding: 1.1rem 1.2rem; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; text-decoration: none; color: inherit; transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease; }
+  .card:hover { border-color: var(--accent); box-shadow: 0 4px 14px var(--shadow); transform: translateY(-1px); }
+  .card .title { font-size: 1.1rem; font-weight: 600; margin: 0 0 0.3rem; }
+  .card .desc { color: var(--muted); font-size: 0.94rem; flex: 1; }
+  .card .meta { color: var(--muted); font-size: 0.82rem; margin-top: 0.8rem; display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .card .meta .pill { background: var(--pill); padding: 0.15rem 0.5rem; border-radius: 4px; font-variant-numeric: tabular-nums; }
+  .card.custom { background: var(--custom-bg); border-style: dashed; }
+  .card.custom .title::before { content: "+ "; color: var(--accent); }
+
+  footer.note { margin-top: 2.5rem; color: var(--muted); font-size: 0.88rem; border-top: 1px solid var(--border); padding-top: 1rem; }
+  footer.note code { background: var(--pill); padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.9em; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Quick Quiz</h1>
+    <button id="theme-btn" title="Toggle theme" aria-label="Toggle theme">☀</button>
+  </header>
+  <main>
+    <section class="hero">
+      <h2>Learn pairs of things, one CSV at a time.</h2>
+      <p>Sporcle-style typing quizzes generated from CSV files. Pick a topic to start, or bring your own data.</p>
+    </section>
+
+    <div class="grid" id="quiz-grid"></div>
+
+    <footer class="note">
+      <strong>Add a quiz:</strong> drop a CSV into <code>quiz/data/</code>, register it in <code>quiz/data.js</code>
+      with a <code>defaultPrompt</code> and <code>defaultAnswer</code> column, and it'll appear here.
+      Optional columns: <code>Aliases</code> (pipe-separated alternates per row), plus any low-cardinality
+      column (≤30 distinct values) automatically becomes a filter.
+    </footer>
+  </main>
+
+  <script src="data.js"></script>
+  <script>
+  // Theme toggle
+  (function () {
+    const btn = document.getElementById('theme-btn');
+    function syncIcon() {
+      const dark = document.documentElement.dataset.theme === 'dark';
+      btn.textContent = dark ? '☀' : '☾';
+      btn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+    }
+    syncIcon();
+    btn.addEventListener('click', () => {
+      const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('quiz-theme', next); } catch (e) {}
+      syncIcon();
+    });
+  })();
+
+  function countRows(csv) {
+    // Quick line count (subtract header, ignore blank trailing line)
+    let n = 0; for (const line of csv.split('\n')) if (line.trim()) n++;
+    return Math.max(0, n - 1);
+  }
+  function detectCategories(csv, promptCol, answerCol) {
+    // Find header
+    const firstLine = csv.split('\n')[0] || '';
+    // crude header split (good enough for previewing; quiz.html uses the proper parser)
+    const headers = [];
+    let f = '', q = false;
+    for (let i = 0; i < firstLine.length; i++) {
+      const c = firstLine[i];
+      if (q) { if (c === '"') q = false; else f += c; }
+      else if (c === '"') q = true;
+      else if (c === ',') { headers.push(f.trim()); f = ''; }
+      else f += c;
+    }
+    if (f) headers.push(f.trim());
+    const skip = new Set([promptCol, answerCol, 'Aliases']);
+    return headers.filter(h => h && !skip.has(h));
+  }
+
+  const grid = document.getElementById('quiz-grid');
+  const quizzes = window.QUIZZES || {};
+  for (const key of Object.keys(quizzes)) {
+    const q = quizzes[key];
+    const a = document.createElement('a');
+    a.className = 'card';
+    a.href = `quiz.html?topic=${encodeURIComponent(q.id)}`;
+    const t = document.createElement('div'); t.className = 'title'; t.textContent = q.title;
+    const d = document.createElement('div'); d.className = 'desc'; d.textContent = q.description;
+    const m = document.createElement('div'); m.className = 'meta';
+    const rows = document.createElement('span'); rows.className = 'pill';
+    rows.textContent = `${countRows(q.embeddedCSV)} pairs`;
+    const pa = document.createElement('span'); pa.className = 'pill';
+    pa.textContent = `${q.defaultPrompt} → ${q.defaultAnswer}`;
+    m.append(rows, pa);
+    a.append(t, d, m);
+    grid.appendChild(a);
+  }
+
+  // "Bring your own CSV" card
+  const custom = document.createElement('a');
+  custom.className = 'card custom';
+  custom.href = 'quiz.html?topic=custom';
+  const ct = document.createElement('div'); ct.className = 'title'; ct.textContent = 'Custom CSV';
+  const cd = document.createElement('div'); cd.className = 'desc';
+  cd.textContent = 'Load any CSV from your computer. Pick which columns are the prompt and the answer.';
+  custom.append(ct, cd);
+  grid.appendChild(custom);
+  </script>
+</body>
+</html>

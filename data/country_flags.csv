@@ -1,0 +1,195 @@
+Country,Continent,Flag,Aliases
+China,Asia,data/flags/china.png,PRC|People's Republic of China
+Japan,Asia,data/flags/japan.png,
+Russia,Europe,data/flags/russia.png,Russian Federation
+DR Congo,Africa,data/flags/dr-congo.png,DRC|Democratic Republic of the Congo|Democratic Republic of Congo|Congo-Kinshasa|Zaire
+Indonesia,Asia,data/flags/indonesia.png,
+Peru,South America,data/flags/peru.png,
+Egypt,Africa,data/flags/egypt.png,
+South Korea,Asia,data/flags/south-korea.png,ROK|Republic of Korea
+Mexico,North America,data/flags/mexico.png,
+United Kingdom,Europe,data/flags/united-kingdom.png,UK|Britain|Great Britain
+Bangladesh,Asia,data/flags/bangladesh.png,
+Iran,Asia,data/flags/iran.png,Persia
+Thailand,Asia,data/flags/thailand.png,Siam
+Vietnam,Asia,data/flags/vietnam.png,
+Iraq,Asia,data/flags/iraq.png,
+Saudi Arabia,Asia,data/flags/saudi-arabia.png,KSA|Kingdom of Saudi Arabia
+Hong Kong (China),Asia,data/flags/hong-kong.png,
+Colombia,South America,data/flags/colombia.png,
+Chile,South America,data/flags/chile.png,
+Turkey,Asia,data/flags/turkey.png,
+Singapore,Asia,data/flags/singapore.png,
+Afghanistan,Asia,data/flags/afghanistan.png,
+Kenya,Africa,data/flags/kenya.png,
+Jordan,Asia,data/flags/jordan.png,
+Algeria,Africa,data/flags/algeria.png,
+Germany,Europe,data/flags/germany.png,Deutschland|FRG|Federal Republic of Germany
+Spain,Europe,data/flags/spain.png,España
+Argentina,South America,data/flags/argentina.png,
+Ethiopia,Africa,data/flags/ethiopia.png,Abyssinia
+Brazil,South America,data/flags/brazil.png,Brasil
+Guatemala,North America,data/flags/guatemala.png,
+South Africa,Africa,data/flags/south-africa.png,RSA
+Ukraine,Europe,data/flags/ukraine.png,
+North Korea,Asia,data/flags/north-korea.png,DPRK|Democratic People's Republic of Korea
+Uzbekistan,Asia,data/flags/uzbekistan.png,
+Italy,Europe,data/flags/italy.png,Italia
+Ecuador,South America,data/flags/ecuador.png,
+Cameroon,Africa,data/flags/cameroon.png,
+Zambia,Africa,data/flags/zambia.png,
+Sudan,Africa,data/flags/sudan.png,
+Taiwan,Asia,data/flags/taiwan.png,ROC|Republic of China
+Yemen,Asia,data/flags/yemen.png,
+Angola,Africa,data/flags/angola.png,
+Burkina Faso,Africa,data/flags/burkina-faso.png,Upper Volta
+Ghana,Africa,data/flags/ghana.png,
+Somalia,Africa,data/flags/somalia.png,
+Azerbaijan,Asia,data/flags/azerbaijan.png,
+Cambodia,Asia,data/flags/cambodia.png,Kampuchea
+Venezuela,South America,data/flags/venezuela.png,
+France,Europe,data/flags/france.png,
+Cuba,North America,data/flags/cuba.png,
+Zimbabwe,Africa,data/flags/zimbabwe.png,Rhodesia
+Syria,Asia,data/flags/syria.png,
+Belarus,Europe,data/flags/belarus.png,Byelorussia|White Russia
+Austria,Europe,data/flags/austria.png,Österreich|Oesterreich
+Poland,Europe,data/flags/poland.png,Polska
+Philippines,Asia,data/flags/philippines.png,
+Mali,Africa,data/flags/mali.png,
+Malaysia,Asia,data/flags/malaysia.png,
+Romania,Europe,data/flags/romania.png,
+Hungary,Europe,data/flags/hungary.png,
+Congo,Africa,data/flags/congo.png,Republic of the Congo|Congo-Brazzaville
+Serbia,Europe,data/flags/serbia.png,
+Uganda,Africa,data/flags/uganda.png,
+Guinea,Africa,data/flags/guinea.png,
+Kazakhstan,Asia,data/flags/kazakhstan.png,
+Mongolia,Asia,data/flags/mongolia.png,
+Honduras,North America,data/flags/honduras.png,
+Senegal,Africa,data/flags/senegal.png,
+Czech Republic,Europe,data/flags/czech-republic.png,Czechia
+Niger,Africa,data/flags/niger.png,
+Uruguay,South America,data/flags/uruguay.png,
+Bulgaria,Europe,data/flags/bulgaria.png,
+Oman,Asia,data/flags/oman.png,
+Madagascar,Africa,data/flags/madagascar.png,
+Nigeria,Africa,data/flags/nigeria.png,
+Georgia,Asia,data/flags/georgia.png,
+Mauritania,Africa,data/flags/mauritania.png,
+Qatar,Asia,data/flags/qatar.png,
+Libya,Africa,data/flags/libya.png,
+Myanmar,Asia,data/flags/myanmar.png,Burma
+Rwanda,Africa,data/flags/rwanda.png,
+Mozambique,Africa,data/flags/mozambique.png,
+Dominican Republic,North America,data/flags/dominican-republic.png,DR
+Armenia,Asia,data/flags/armenia.png,
+Panama,North America,data/flags/panama.png,
+Kyrgyzstan,Asia,data/flags/kyrgyzstan.png,Kirghizia
+Sierra Leone,Africa,data/flags/sierra-leone.png,
+Nicaragua,North America,data/flags/nicaragua.png,
+Canada,North America,data/flags/canada.png,
+Pakistan,Asia,data/flags/pakistan.png,
+Liberia,Africa,data/flags/liberia.png,
+United Arab Emirates,Asia,data/flags/united-arab-emirates.png,UAE|Emirates
+Malawi,Africa,data/flags/malawi.png,Nyasaland
+Haiti,North America,data/flags/haiti.png,
+Sweden,Europe,data/flags/sweden.png,Sverige
+Eritrea,Africa,data/flags/eritrea.png,
+Israel,Asia,data/flags/israel.png,
+Laos,Asia,data/flags/laos.png,
+Chad,Africa,data/flags/chad.png,
+Netherlands,Europe,data/flags/netherlands.png,Holland
+Central African Republic,Africa,data/flags/central-african-republic.png,CAR
+Tajikistan,Asia,data/flags/tajikistan.png,
+Nepal,Asia,data/flags/nepal.png,
+Togo,Africa,data/flags/togo.png,
+Turkmenistan,Asia,data/flags/turkmenistan.png,
+Moldova,Europe,data/flags/moldova.png,
+Croatia,Europe,data/flags/croatia.png,Hrvatska
+Gabon,Africa,data/flags/gabon.png,
+Norway,Europe,data/flags/norway.png,Norge
+Macau (China),Asia,data/flags/macau.png,Macao
+United States,North America,data/flags/united-states.png,USA|US|America|United States of America|U.S.A.|U.S.
+Jamaica,North America,data/flags/jamaica.png,
+Finland,Europe,data/flags/finland.png,Suomi
+Tunisia,Africa,data/flags/tunisia.png,
+Denmark,Europe,data/flags/denmark.png,
+Greece,Europe,data/flags/greece.png,Hellas
+Latvia,Europe,data/flags/latvia.png,
+Djibouti,Africa,data/flags/djibouti.png,
+Ireland,Europe,data/flags/ireland.png,Éire|Eire
+Morocco,Africa,data/flags/morocco.png,
+Lithuania,Europe,data/flags/lithuania.png,
+El Salvador,North America,data/flags/el-salvador.png,
+Albania,Europe,data/flags/albania.png,
+North Macedonia,Europe,data/flags/north-macedonia.png,Macedonia|FYROM|Republic of North Macedonia
+South Sudan,Africa,data/flags/south-sudan.png,
+Paraguay,South America,data/flags/paraguay.png,
+Portugal,Europe,data/flags/portugal.png,
+Guinea-Bissau,Africa,data/flags/guinea-bissau.png,
+Slovakia,Europe,data/flags/slovakia.png,
+Estonia,Europe,data/flags/estonia.png,
+Australia,Oceania,data/flags/australia.png,Oz
+Namibia,Africa,data/flags/namibia.png,South-West Africa
+Tanzania,Africa,data/flags/tanzania.png,
+Papua New Guinea,Oceania,data/flags/papua-new-guinea.png,PNG
+Ivory Coast,Africa,data/flags/ivory-coast.png,Côte d'Ivoire|Cote d'Ivoire
+Lebanon,Asia,data/flags/lebanon.png,
+Bolivia,South America,data/flags/bolivia.png,
+Puerto Rico (US),North America,data/flags/puerto-rico.png,PR
+Costa Rica,North America,data/flags/costa-rica.png,
+Lesotho,Africa,data/flags/lesotho.png,Basutoland
+Cyprus,Asia,data/flags/cyprus.png,
+Slovenia,Europe,data/flags/slovenia.png,
+Timor-Leste,Asia,data/flags/timor-leste.png,East Timor
+Bosnia and Herzegovina,Europe,data/flags/bosnia-and-herzegovina.png,Bosnia|BiH
+Bahamas,North America,data/flags/bahamas.png,The Bahamas
+Botswana,Africa,data/flags/botswana.png,Bechuanaland
+Benin,Africa,data/flags/benin.png,Dahomey
+India,Asia,data/flags/india.png,Bharat
+Suriname,South America,data/flags/suriname.png,Surinam
+Kosovo,Europe,data/flags/kosovo.png,
+Sahrawi Arab Democratic Republic,Africa,data/flags/sahrawi-arab-democratic-republic.png,Western Sahara|SADR
+New Zealand,Oceania,data/flags/new-zealand.png,NZ|Aotearoa
+Maldives,Asia,data/flags/maldives.png,
+Bahrain,Asia,data/flags/bahrain.png,
+Montenegro,Europe,data/flags/montenegro.png,Crna Gora
+Belgium,Europe,data/flags/belgium.png,
+Cape Verde,Africa,data/flags/cape-verde.png,Cabo Verde
+Mauritius,Africa,data/flags/mauritius.png,
+Curaçao (Netherlands),North America,data/flags/curacao.png,
+Luxembourg,Europe,data/flags/luxembourg.png,
+Burundi,Africa,data/flags/burundi.png,
+Switzerland,Europe,data/flags/switzerland.png,Helvetia|Schweiz|Suisse
+Transnistria,Europe,data/flags/transnistria.png,Pridnestrovie|PMR
+Iceland,Europe,data/flags/iceland.png,
+Guyana,South America,data/flags/guyana.png,British Guiana
+Bhutan,Asia,data/flags/bhutan.png,
+Comoros,Africa,data/flags/comoros.png,
+Barbados,North America,data/flags/barbados.png,
+Sri Lanka,Asia,data/flags/sri-lanka.png,Ceylon
+Brunei,Asia,data/flags/brunei.png,Brunei Darussalam
+Eswatini,Africa,data/flags/eswatini.png,Swaziland
+New Caledonia (France),Oceania,data/flags/new-caledonia.png,
+Fiji,Oceania,data/flags/fiji.png,
+Solomon Islands,Oceania,data/flags/solomon-islands.png,
+São Tomé and Príncipe,Africa,data/flags/sao-tome-and-principe.png,STP|Sao Tome and Principe
+Kiribati,Oceania,data/flags/kiribati.png,
+Kuwait,Asia,data/flags/kuwait.png,
+Vanuatu,Oceania,data/flags/vanuatu.png,New Hebrides
+Northern Mariana Islands (USA),Oceania,data/flags/northern-mariana-islands.png,CNMI|Northern Marianas
+Samoa,Oceania,data/flags/samoa.png,Western Samoa
+Palestine,Asia,data/flags/palestine.png,Palestinian Territories|State of Palestine
+Monaco,Europe,data/flags/monaco.png,
+Trinidad and Tobago,North America,data/flags/trinidad-and-tobago.png,Trinidad|TT
+Grenada,North America,data/flags/grenada.png,
+Gambia,Africa,data/flags/gambia.png,The Gambia
+Aruba (Netherlands),North America,data/flags/aruba.png,
+Tonga,Oceania,data/flags/tonga.png,
+Seychelles,Africa,data/flags/seychelles.png,
+French Polynesia (France),Oceania,data/flags/french-polynesia.png,Tahiti
+Andorra,Europe,data/flags/andorra.png,
+Antigua and Barbuda,North America,data/flags/antigua-and-barbuda.png,Antigua
+Belize,North America,data/flags/belize.png,British Honduras
+Greenland (Denmark),North America,data/flags/greenland.png,

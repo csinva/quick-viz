@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quick Quiz</title>
+<script>
+  // Apply theme before paint to avoid a flash.
+  (function () {
+    var t = localStorage.getItem('quiz-theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #fafaf7;
+    --panel: #ffffff;
+    --border: #e3e3dc;
+    --text: #1d1d1b;
+    --muted: #777;
+    --accent: #1f6feb;
+    --accent-hover: #1858c4;
+    --ok: #15803d;
+    --ok-bg: #dcfce7;
+    --bad: #b91c1c;
+    --bad-bg: #fee2e2;
+    --bad-border: #f3c1c1;
+    --pill: #f1f1ea;
+    --btn-hover: #f0f0e9;
+    --input-disabled-bg: #f4f4ef;
+    --warn-bg: #fde68a;
+    --row-divider: #ecece5;
+    --empty-dash: #ccc;
+    --skip-bg: #fff7ed;
+    --skip-text: #c2410c;
+    --current-bg: #eff6ff;
+    --flash-bg: #fef08a;
+    --filter-bg: #faf9f3;
+    --backdrop: rgba(0,0,0,0.18);
+    --shadow: var(--shadow);
+  }
+  [data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0f1419;
+    --panel: #1a1f26;
+    --border: #2d343f;
+    --text: #e8e8e6;
+    --muted: #8b9098;
+    --accent: #4d8df0;
+    --accent-hover: #6ba2f5;
+    --ok: #4ade80;
+    --ok-bg: #14532d;
+    --bad: #f87171;
+    --bad-bg: #4c1d24;
+    --bad-border: #7f3030;
+    --pill: #262d36;
+    --btn-hover: #2a313b;
+    --input-disabled-bg: #161b22;
+    --warn-bg: #5a4a14;
+    --row-divider: #262d36;
+    --empty-dash: #4a505a;
+    --skip-bg: #3a2a14;
+    --skip-text: #fb923c;
+    --current-bg: #1e2a3d;
+    --flash-bg: #5a4a14;
+    --filter-bg: #161b22;
+    --backdrop: rgba(0,0,0,0.55);
+    --shadow: rgba(0,0,0,0.4);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font: 15px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
+  header { display: flex; align-items: center; gap: 1rem; padding: 0.9rem 1.2rem; border-bottom: 1px solid var(--border); background: var(--panel); }
+  header h1 { font-size: 1.1rem; margin: 0; font-weight: 600; }
+  header a#home-link { color: var(--muted); text-decoration: none; font-size: 0.9rem; padding: 0.25rem 0.5rem; border-radius: 4px; }
+  header a#home-link:hover { background: var(--pill); color: var(--text); }
+  header .spacer { flex: 1; }
+  header .filename { color: var(--muted); font-size: 0.85rem; }
+  h1, h2, h3 { color: var(--text); }
+  button { font: inherit; color: var(--text); padding: 0.45rem 0.85rem; border: 1px solid var(--border); background: var(--panel); border-radius: 6px; cursor: pointer; }
+  button:hover { background: var(--btn-hover); }
+  button.primary { background: var(--accent); color: white; border-color: var(--accent); }
+  button.primary:hover { background: var(--accent-hover); }
+  button.danger { background: var(--panel); color: var(--bad); border-color: var(--bad-border); }
+  button.danger:hover { background: var(--bad-bg); }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  main { max-width: 1200px; margin: 0 auto; padding: 1rem 1.2rem 3rem; }
+
+  .quiz-bar { display: grid; grid-template-columns: 1fr auto; gap: 0.7rem 1rem; align-items: center; margin-bottom: 1rem; }
+  .quiz-bar .prompt-text { grid-column: 1 / -1; font-size: 1rem; color: var(--muted); }
+  .quiz-bar .prompt-text strong { color: var(--text); }
+  #answer-input { width: 100%; color: var(--text); padding: 0.7rem 0.9rem; font-size: 1.15rem; border: 2px solid var(--border); border-radius: 8px; background: var(--panel); }
+  #answer-input:focus { outline: none; border-color: var(--accent); }
+  #answer-input:disabled { background: var(--input-disabled-bg); color: var(--muted); }
+  .stats { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+  .stat { padding: 0.4rem 0.7rem; background: var(--pill); border-radius: 6px; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .stat.time { min-width: 5.5rem; text-align: center; }
+  .stat.time.warn { background: var(--warn-bg); }
+  .stat.time.danger { background: var(--bad-bg); color: var(--bad); }
+
+  #grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 0.15rem 1.5rem; border-top: 1px solid var(--border); padding-top: 0.5rem; }
+  .pair { display: grid; grid-template-columns: 1fr 1.1fr; gap: 0.6rem; padding: 0.28rem 0.2rem; border-bottom: 1px dashed var(--row-divider); align-items: baseline; }
+  .pair .prompt { color: var(--text); font-weight: 500; }
+  .pair .answer { color: var(--muted); }
+  .pair .answer.empty::before { content: "—"; color: var(--empty-dash); }
+  .pair.solved { background: var(--ok-bg); }
+  .pair.solved .answer { color: var(--ok); font-weight: 600; }
+  .pair.revealed { background: var(--bad-bg); }
+  .pair.revealed .answer { color: var(--bad); font-weight: 600; }
+  .pair.just-solved { animation: flash 0.6s ease; }
+  .pair.skipped { background: var(--skip-bg); }
+  .pair.skipped .answer { color: var(--skip-text); font-weight: 600; }
+  .pair.wrong { background: var(--bad-bg); }
+  .pair.wrong .answer { color: var(--text); font-weight: 600; }
+  .pair.wrong .answer .user-said { color: var(--bad); text-decoration: line-through; opacity: 0.75; margin-right: 0.35rem; font-style: italic; }
+  .pair.wrong .answer .correct { color: var(--bad); }
+  .pair.current { background: var(--current-bg); box-shadow: inset 3px 0 0 var(--accent); }
+  .pair.current .prompt::after { content: " ←"; color: var(--accent); }
+  .pair.hidden { display: none; }
+  @keyframes flash { 0% { background: var(--flash-bg); } 100% { background: var(--ok-bg); } }
+
+  /* In-order current-question banner */
+  #current-question { grid-column: 1 / -1; display: none; padding: 0.9rem 1.1rem; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; }
+  #current-question.show { display: block; }
+  #current-question .meta { font-size: 0.85rem; color: var(--muted); letter-spacing: 0.02em; }
+  #current-question .qprompt { font-size: 1.9rem; font-weight: 700; line-height: 1.15; margin-top: 0.15rem; }
+  #current-question .sub { font-size: 0.9rem; color: var(--muted); margin-top: 0.2rem; }
+  #current-question.done .qprompt { color: var(--muted); font-size: 1.2rem; font-weight: 600; }
+
+  /* Image prompts (e.g. flags) */
+  .prompt-img { display: block; max-width: 88px; max-height: 56px; object-fit: contain; border: 1px solid var(--border); background: var(--panel); border-radius: 3px; }
+  #current-question .qprompt .prompt-img { max-width: 280px; max-height: 180px; margin: 0 auto; }
+  #review .p .prompt-img { max-width: 64px; max-height: 40px; }
+
+  /* Retry-mistakes subset banner */
+  #subset-banner { display: none; align-items: center; gap: 0.6rem; padding: 0.55rem 0.85rem; margin-bottom: 0.75rem; background: var(--current-bg); border: 1px solid var(--border); border-radius: 8px; font-size: 0.95rem; }
+  #subset-banner.show { display: flex; }
+  #subset-banner .label { flex: 1; }
+  #subset-banner .label strong { color: var(--accent); }
+  #review .retry { display: inline-block; margin-bottom: 0.8rem; padding: 0.55rem 1rem; background: var(--accent); color: white; border: 1px solid var(--accent); border-radius: 6px; cursor: pointer; font: inherit; }
+  #review .retry:hover { background: var(--accent-hover); }
+  #review .retry:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* End-of-quiz review panel */
+  #review { margin-top: 1.5rem; padding: 1rem 1.2rem; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; }
+  #review h3 { margin: 0 0 0.5rem; font-size: 1rem; }
+  #review .group { margin-bottom: 1rem; }
+  #review .group:last-child { margin-bottom: 0; }
+  #review ul { list-style: none; margin: 0; padding: 0; }
+  #review li { padding: 0.25rem 0; border-bottom: 1px dashed var(--row-divider); display: grid; grid-template-columns: minmax(120px, 1fr) 1.4fr; gap: 0.8rem; align-items: baseline; }
+  #review li:last-child { border-bottom: 0; }
+  #review .p { font-weight: 600; }
+  #review .a .typed { color: var(--bad); text-decoration: line-through; opacity: 0.75; font-style: italic; margin-right: 0.4rem; }
+  #review .a .correct { color: var(--ok); font-weight: 600; }
+  #review .a .skip { color: var(--skip-text); font-weight: 600; }
+
+  /* Settings panel as a side drawer */
+  #settings-panel { position: fixed; top: 0; right: 0; width: min(420px, 100%); height: 100%; background: var(--panel); border-left: 1px solid var(--border); box-shadow: -4px 0 16px var(--shadow); padding: 1rem 1.2rem; overflow-y: auto; transform: translateX(100%); transition: transform 0.18s ease; z-index: 50; }
+  #settings-panel.open { transform: translateX(0); }
+  #settings-panel h2 { font-size: 1rem; margin: 1.4rem 0 0.4rem; }
+  #settings-panel h2:first-of-type { margin-top: 0.5rem; }
+  #settings-panel label { display: block; margin: 0.3rem 0; font-size: 0.92rem; }
+  #settings-panel select, #settings-panel input[type=number] { width: 100%; color: var(--text); padding: 0.35rem 0.5rem; border: 1px solid var(--border); border-radius: 5px; font: inherit; background: var(--panel); }
+  #settings-panel input[type=number] { width: 6rem; }
+  .settings-header { display: flex; justify-content: space-between; align-items: center; }
+  .settings-header h1 { font-size: 1.1rem; margin: 0; }
+  .file-row { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin-top: 0.3rem; }
+  .filter-group { margin-top: 0.6rem; padding: 0.5rem 0.7rem; background: var(--filter-bg); border: 1px solid var(--border); border-radius: 6px; }
+  .filter-group summary { cursor: pointer; font-weight: 600; font-size: 0.92rem; padding: 0.1rem 0; }
+  .filter-group summary .count { color: var(--muted); font-weight: 400; margin-left: 0.4rem; }
+  .filter-group .filter-actions { display: flex; gap: 0.4rem; margin: 0.3rem 0; }
+  .filter-group .filter-actions button { padding: 0.2rem 0.5rem; font-size: 0.85rem; }
+  .filter-group .filter-values { max-height: 240px; overflow-y: auto; padding: 0.2rem 0; }
+  .filter-group label { display: flex; align-items: center; gap: 0.5rem; padding: 0.15rem 0; margin: 0; cursor: pointer; }
+  .filter-group label input { margin: 0; }
+  .note { color: var(--muted); font-size: 0.85rem; margin-top: 0.3rem; }
+
+  .backdrop { position: fixed; inset: 0; background: var(--backdrop); z-index: 40; display: none; }
+  .backdrop.open { display: block; }
+
+  @media (max-width: 600px) {
+    .quiz-bar { grid-template-columns: 1fr; }
+    .stats { justify-content: flex-start; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <a href="index.html" id="home-link" aria-label="Back to home">← Home</a>
+    <h1 id="topic-title">Quick Quiz</h1>
+    <span class="filename" id="filename">—</span>
+    <span class="spacer"></span>
+    <button id="theme-btn" title="Toggle theme" aria-label="Toggle theme">☀</button>
+    <button id="settings-btn">⚙ Settings</button>
+  </header>
+
+  <main>
+    <div id="subset-banner">
+      <div class="label">Practicing <strong id="subset-count">0</strong> from last round</div>
+      <button id="exit-subset">Back to full set</button>
+    </div>
+    <div class="quiz-bar">
+      <div class="prompt-text">Type the <strong id="prompt-noun">answer</strong> for each <strong id="answer-noun">item</strong></div>
+      <div id="current-question">
+        <div class="meta" id="cq-meta">Question 0 / 0</div>
+        <div class="qprompt" id="cq-prompt">—</div>
+        <div class="sub" id="cq-sub"></div>
+      </div>
+      <input type="text" id="answer-input" placeholder="Click here to start…" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <div class="stats">
+        <span class="stat" id="score">0 / 0</span>
+        <span class="stat time" id="timer">15:00</span>
+        <button id="start-btn" class="primary">Start</button>
+        <button id="skip-btn" hidden>Skip</button>
+        <button id="giveup-btn" class="danger" disabled>Give up</button>
+      </div>
+    </div>
+    <div id="grid"></div>
+    <div id="review" hidden></div>
+  </main>
+
+  <div class="backdrop" id="backdrop"></div>
+  <aside id="settings-panel" aria-label="Settings">
+    <div class="settings-header">
+      <h1>Settings</h1>
+      <button id="close-settings">Close</button>
+    </div>
+
+    <h2>CSV Data</h2>
+    <div class="file-row">
+      <input type="file" id="csv-file" accept=".csv,text/csv">
+      <button id="reload-default">Reload default</button>
+    </div>
+    <div class="note" id="csv-info"></div>
+
+    <h2>Quiz columns</h2>
+    <label>Prompt column (shown to you)
+      <select id="prompt-col"></select>
+    </label>
+    <label>Answer column (what you type)
+      <select id="answer-col"></select>
+    </label>
+
+    <h2>Quiz options</h2>
+    <label>Mode
+      <select id="mode">
+        <option value="inorder" selected>In-order (one question at a time)</option>
+        <option value="free">Free (answer any order, all prompts visible)</option>
+      </select>
+    </label>
+    <label>Time limit (minutes)
+      <input type="number" id="time-limit" min="1" max="180" value="15">
+    </label>
+    <label>Order
+      <select id="order">
+        <option value="random" selected>Random</option>
+        <option value="alpha">Alphabetical (by prompt)</option>
+        <option value="original">CSV order</option>
+      </select>
+    </label>
+
+    <h2>Filters</h2>
+    <div class="note">Any non-prompt/answer column with a small set of distinct values is shown here. Add a "Continent" column to your CSV and it'll appear automatically.</div>
+    <div id="filters"></div>
+  </aside>
+
+  <script src="data.js"></script>
+  <script>
+  // ---------- CSV parsing ----------
+  function parseCSV(text) {
+    const rows = [];
+    let field = '', row = [], inQuote = false, i = 0;
+    while (i < text.length) {
+      const c = text[i];
+      if (inQuote) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { field += '"'; i += 2; }
+          else { inQuote = false; i++; }
+        } else { field += c; i++; }
+      } else {
+        if (c === '"') { inQuote = true; i++; }
+        else if (c === ',') { row.push(field); field = ''; i++; }
+        else if (c === '\n') { row.push(field); rows.push(row); field = ''; row = []; i++; }
+        else if (c === '\r') { i++; }
+        else { field += c; i++; }
+      }
+    }
+    if (field !== '' || row.length) { row.push(field); rows.push(row); }
+    while (rows.length && rows[rows.length - 1].every(x => x === '')) rows.pop();
+    return rows;
+  }
+
+  function rowsToObjects(rows) {
+    if (!rows.length) return { headers: [], records: [] };
+    const headers = rows[0].map(h => h.trim());
+    const records = rows.slice(1).map(r => {
+      const o = {};
+      headers.forEach((h, i) => o[h] = (r[i] ?? '').trim());
+      return o;
+    });
+    return { headers, records };
+  }
+
+  // ---------- Normalization & matching ----------
+  function normalize(s) {
+    return (s || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .replace(/[‘’ʼ`]/g, "'")
+      .replace(/[.,!?;:]/g, '')
+      .replace(/-/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/^the\s+/, '');
+  }
+
+  function variantsOf(value) {
+    const out = new Set();
+    if (!value) return out;
+    const add = v => { v = v.replace(/\s+/g, ' ').trim(); if (v) out.add(v); };
+    const base = normalize(value);
+    add(base);
+    add(base.replace(/\s*\([^)]*\)\s*/g, ' '));
+    // Slash-separated alternates ("Brades / Plymouth")
+    for (const part of value.split('/')) {
+      const np = normalize(part);
+      add(np);
+      add(np.replace(/\s*\([^)]*\)\s*/g, ' '));
+    }
+    // "the X" → also accept "X"
+    for (const v of [...out]) {
+      if (v.startsWith('the ')) add(v.slice(4));
+    }
+    return out;
+  }
+
+  // Is this cell value an image path the page can render directly?
+  const IMG_EXT_RE = /\.(png|jpe?g|gif|svg|webp|avif)(\?|#|$)/i;
+  function isImagePath(s) { return typeof s === 'string' && IMG_EXT_RE.test(s.trim()); }
+  function makePromptEl(prompt) {
+    if (isImagePath(prompt)) {
+      const img = document.createElement('img');
+      img.className = 'prompt-img';
+      img.src = prompt;
+      img.alt = '';
+      img.loading = 'lazy';
+      return img;
+    }
+    return document.createTextNode(prompt);
+  }
+
+  // ---------- Fuzzy matching (Damerau-Levenshtein with adjacent transposition) ----------
+  function damerauLevenshtein(a, b) {
+    if (a === b) return 0;
+    const m = a.length, n = b.length;
+    if (!m) return n;
+    if (!n) return m;
+    const d = Array.from({ length: m + 1 }, () => new Array(n + 1));
+    for (let i = 0; i <= m; i++) d[i][0] = i;
+    for (let j = 0; j <= n; j++) d[0][j] = j;
+    for (let i = 1; i <= m; i++) {
+      for (let j = 1; j <= n; j++) {
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
+        if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+          d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+        }
+      }
+    }
+    return d[m][n];
+  }
+  // Allowed edits scale with target length: short words stay strict to avoid false hits.
+  function typoThreshold(len) {
+    if (len <= 3) return 0;
+    if (len <= 5) return 1;
+    return 2;
+  }
+  // Return the single best-matching entry (uniquely closest within threshold), or null.
+  function findFuzzyMatch(norm, candidates) {
+    if (!norm) return null;
+    let best = null, bestDist = Infinity, tied = false;
+    for (const e of candidates) {
+      let entryDist = Infinity;
+      for (const v of e.accepted) {
+        const t = typoThreshold(v.length);
+        if (Math.abs(v.length - norm.length) > t) continue;
+        const d = damerauLevenshtein(norm, v);
+        if (d <= t && d < entryDist) entryDist = d;
+      }
+      if (entryDist === Infinity) continue;
+      if (entryDist < bestDist) { best = e; bestDist = entryDist; tied = false; }
+      else if (entryDist === bestDist) { tied = true; }
+    }
+    return tied ? null : best;
+  }
+
+  // ---------- State ----------
+  const state = {
+    headers: [],
+    records: [],
+    csvName: '',
+    promptCol: '',
+    answerCol: '',
+    filterCols: [],            // categorical column names
+    filters: {},               // colName -> Set of allowed values
+    order: 'random',
+    mode: 'inorder',           // 'free' | 'inorder'
+    subsetMode: false,         // true when practicing only last round's mistakes
+    subsetKeys: null,          // Set<string> of "promptanswer" allowed in subset mode
+    currentIdx: -1,            // active question index in in-order mode
+    durationSec: 15 * 60,
+    remainingSec: 15 * 60,
+    running: false,
+    finished: false,
+    intervalId: null,
+    entries: [],               // [{prompt, answer, solved, skipped}]
+    variantIndex: new Map(),   // normalized -> [entry indices]
+  };
+
+  // ---------- DOM refs ----------
+  const $ = id => document.getElementById(id);
+  const els = {
+    input: $('answer-input'),
+    score: $('score'),
+    timer: $('timer'),
+    startBtn: $('start-btn'),
+    giveupBtn: $('giveup-btn'),
+    skipBtn: $('skip-btn'),
+    cq: $('current-question'),
+    cqMeta: $('cq-meta'),
+    cqPrompt: $('cq-prompt'),
+    cqSub: $('cq-sub'),
+    promptText: document.querySelector('.prompt-text'),
+    grid: $('grid'),
+    review: $('review'),
+    subsetBanner: $('subset-banner'),
+    subsetCount: $('subset-count'),
+    exitSubsetBtn: $('exit-subset'),
+    promptNoun: $('prompt-noun'),
+    answerNoun: $('answer-noun'),
+    filename: $('filename'),
+    topicTitle: $('topic-title'),
+    settingsBtn: $('settings-btn'),
+    closeSettings: $('close-settings'),
+    settingsPanel: $('settings-panel'),
+    backdrop: $('backdrop'),
+    csvFile: $('csv-file'),
+    reloadDefault: $('reload-default'),
+    csvInfo: $('csv-info'),
+    promptColSel: $('prompt-col'),
+    answerColSel: $('answer-col'),
+    timeLimit: $('time-limit'),
+    orderSel: $('order'),
+    modeSel: $('mode'),
+    filters: $('filters'),
+  };
+
+  // ---------- Theme toggle ----------
+  (function () {
+    const btn = document.getElementById('theme-btn');
+    function syncIcon() {
+      const dark = document.documentElement.dataset.theme === 'dark';
+      btn.textContent = dark ? '☀' : '☾';
+      btn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+    }
+    syncIcon();
+    btn.addEventListener('click', () => {
+      const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('quiz-theme', next); } catch (e) {}
+      syncIcon();
+    });
+  })();
+
+  // ---------- Settings panel ----------
+  function openSettings() { els.settingsPanel.classList.add('open'); els.backdrop.classList.add('open'); }
+  function closeSettings() { els.settingsPanel.classList.remove('open'); els.backdrop.classList.remove('open'); }
+  els.settingsBtn.addEventListener('click', openSettings);
+  els.closeSettings.addEventListener('click', closeSettings);
+  els.backdrop.addEventListener('click', closeSettings);
+  els.exitSubsetBtn.addEventListener('click', exitSubsetMode);
+
+  // ---------- Load CSV ----------
+  function loadCSVText(text, name, opts = {}) {
+    const rows = parseCSV(text);
+    const { headers, records } = rowsToObjects(rows);
+    if (!headers.length || !records.length) {
+      alert('Could not parse CSV — no rows found.');
+      return;
+    }
+    state.headers = headers;
+    state.records = records;
+    state.csvName = name;
+    els.filename.textContent = name;
+    els.csvInfo.textContent = `${records.length} rows, ${headers.length} columns`;
+
+    // Prefer caller-supplied defaults (from quiz registry); otherwise fall back to heuristics.
+    const preferredPrompt = opts.defaultPrompt && headers.includes(opts.defaultPrompt) ? opts.defaultPrompt : null;
+    const preferredAnswer = opts.defaultAnswer && headers.includes(opts.defaultAnswer) ? opts.defaultAnswer : null;
+    state.promptCol = preferredPrompt
+      || (headers.includes('Capital') ? 'Capital' : (headers[1] || headers[0]));
+    state.answerCol = preferredAnswer
+      || (headers.includes('Country/Dependency') ? 'Country/Dependency' : headers[0]);
+    if (state.promptCol === state.answerCol) state.promptCol = headers.find(h => h !== state.answerCol) || state.promptCol;
+
+    populateColumnSelectors();
+    rebuildFilters();
+    rebuildEntries();
+    resetQuiz();
+  }
+
+  function populateColumnSelectors() {
+    for (const sel of [els.promptColSel, els.answerColSel]) {
+      sel.innerHTML = '';
+      for (const h of state.headers) {
+        const opt = document.createElement('option');
+        opt.value = h; opt.textContent = h;
+        sel.appendChild(opt);
+      }
+    }
+    els.promptColSel.value = state.promptCol;
+    els.answerColSel.value = state.answerCol;
+  }
+
+  els.promptColSel.addEventListener('change', () => {
+    state.promptCol = els.promptColSel.value;
+    if (state.promptCol === state.answerCol) {
+      // pick first other column as answer
+      const other = state.headers.find(h => h !== state.promptCol);
+      if (other) { state.answerCol = other; els.answerColSel.value = other; }
+    }
+    rebuildFilters();
+    rebuildEntries();
+    resetQuiz();
+  });
+  els.answerColSel.addEventListener('change', () => {
+    state.answerCol = els.answerColSel.value;
+    if (state.promptCol === state.answerCol) {
+      const other = state.headers.find(h => h !== state.answerCol);
+      if (other) { state.promptCol = other; els.promptColSel.value = other; }
+    }
+    rebuildFilters();
+    rebuildEntries();
+    resetQuiz();
+  });
+  els.timeLimit.addEventListener('change', () => {
+    const m = Math.max(1, Math.min(180, parseInt(els.timeLimit.value, 10) || 15));
+    state.durationSec = m * 60;
+    els.timeLimit.value = m;
+    resetQuiz();
+  });
+  els.orderSel.addEventListener('change', () => {
+    state.order = els.orderSel.value;
+    rebuildEntries();
+    resetQuiz();
+  });
+  els.modeSel.addEventListener('change', () => {
+    state.mode = els.modeSel.value;
+    resetQuiz();
+  });
+
+  // ---------- Filters ----------
+  function rebuildFilters() {
+    state.filterCols = [];
+    state.filters = {};
+    els.filters.innerHTML = '';
+    const skipCols = new Set([state.promptCol, state.answerCol]);
+    for (const col of state.headers) {
+      if (skipCols.has(col)) continue;
+      const vals = new Set();
+      for (const r of state.records) {
+        const v = r[col];
+        if (v) vals.add(v);
+        if (vals.size > 30) break;
+      }
+      if (vals.size < 2 || vals.size > 30) continue;
+      state.filterCols.push(col);
+      state.filters[col] = new Set(vals);
+      renderFilterGroup(col, vals);
+    }
+    if (!state.filterCols.length) {
+      els.filters.innerHTML = '<div class="note" style="margin-top:0.5rem">No categorical columns detected. Add a column like "Continent" (with up to 30 distinct values) to use it as a filter.</div>';
+    }
+  }
+
+  function renderFilterGroup(col, values) {
+    const sorted = [...values].sort((a, b) => a.localeCompare(b));
+    const wrap = document.createElement('details');
+    wrap.className = 'filter-group';
+    wrap.open = false;
+    const summary = document.createElement('summary');
+    summary.innerHTML = `${col}<span class="count">all ${sorted.length}</span>`;
+    wrap.appendChild(summary);
+
+    const actions = document.createElement('div');
+    actions.className = 'filter-actions';
+    const allBtn = document.createElement('button'); allBtn.textContent = 'All';
+    const noneBtn = document.createElement('button'); noneBtn.textContent = 'None';
+    actions.append(allBtn, noneBtn);
+    wrap.appendChild(actions);
+
+    const valuesDiv = document.createElement('div');
+    valuesDiv.className = 'filter-values';
+    const checks = [];
+    for (const v of sorted) {
+      const lbl = document.createElement('label');
+      const chk = document.createElement('input');
+      chk.type = 'checkbox'; chk.checked = true; chk.value = v;
+      chk.addEventListener('change', () => {
+        if (chk.checked) state.filters[col].add(v);
+        else state.filters[col].delete(v);
+        const n = state.filters[col].size;
+        summary.querySelector('.count').textContent =
+          n === sorted.length ? `all ${n}` : `${n} of ${sorted.length}`;
+        rebuildEntries();
+        resetQuiz();
+      });
+      checks.push(chk);
+      lbl.appendChild(chk);
+      const span = document.createElement('span'); span.textContent = v;
+      lbl.appendChild(span);
+      valuesDiv.appendChild(lbl);
+    }
+    wrap.appendChild(valuesDiv);
+
+    allBtn.addEventListener('click', e => { e.preventDefault(); for (const c of checks) { c.checked = true; c.dispatchEvent(new Event('change')); } });
+    noneBtn.addEventListener('click', e => { e.preventDefault(); for (const c of checks) { c.checked = false; c.dispatchEvent(new Event('change')); } });
+
+    els.filters.appendChild(wrap);
+  }
+
+  // ---------- Subset mode (retry mistakes) ----------
+  function subsetKey(prompt, answer) { return prompt + '' + answer; }
+  function startRetryMistakes() {
+    const keys = new Set();
+    for (const e of state.entries) {
+      if (e.solved) continue; // keep only mistakes/skipped/missed
+      keys.add(subsetKey(e.prompt, e.answer));
+    }
+    if (!keys.size) return;
+    state.subsetMode = true;
+    state.subsetKeys = keys;
+    rebuildEntries();
+    resetQuiz();
+    startQuiz();
+  }
+  function exitSubsetMode() {
+    state.subsetMode = false;
+    state.subsetKeys = null;
+    rebuildEntries();
+    resetQuiz();
+  }
+
+  // ---------- Build entries ----------
+  function rebuildEntries() {
+    // Look up an Aliases column generically (case-insensitive header match).
+    const aliasCol = state.headers.find(h => h.trim().toLowerCase() === 'aliases');
+    const entries = [];
+    for (const r of state.records) {
+      let pass = true;
+      for (const col of state.filterCols) {
+        if (!state.filters[col].has(r[col])) { pass = false; break; }
+      }
+      if (!pass) continue;
+      const prompt = r[state.promptCol] || '';
+      const answer = r[state.answerCol] || '';
+      if (!prompt || !answer) continue;
+      const accepted = new Set(variantsOf(answer));
+      if (aliasCol && r[aliasCol]) {
+        for (const a of r[aliasCol].split('|')) {
+          const t = a.trim();
+          if (!t) continue;
+          for (const v of variantsOf(t)) accepted.add(v);
+        }
+      }
+      entries.push({ prompt, answer, solved: false, skipped: false, wrong: false, wrongAnswer: '', accepted });
+    }
+    if (state.order === 'alpha') {
+      // When prompts are images, sort alphabetically by the answer instead of by the file path.
+      const promptIsImg = entries.length > 0 && isImagePath(entries[0].prompt);
+      const sortKey = promptIsImg ? (e => normalize(e.answer)) : (e => normalize(e.prompt));
+      entries.sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
+    } else if (state.order === 'random') {
+      for (let i = entries.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [entries[i], entries[j]] = [entries[j], entries[i]];
+      }
+    }
+    // Subset mode: keep only entries flagged from the last round's mistakes.
+    if (state.subsetMode && state.subsetKeys) {
+      const keep = entries.filter(e => state.subsetKeys.has(subsetKey(e.prompt, e.answer)));
+      if (keep.length) { entries.length = 0; for (const e of keep) entries.push(e); }
+      else { state.subsetMode = false; state.subsetKeys = null; }
+    }
+    // build variant index from each entry's accepted set
+    const idx = new Map();
+    entries.forEach((e, i) => {
+      for (const v of e.accepted) {
+        if (!idx.has(v)) idx.set(v, []);
+        idx.get(v).push(i);
+      }
+    });
+    state.entries = entries;
+    state.variantIndex = idx;
+    els.promptNoun.textContent = state.answerCol;
+    els.answerNoun.textContent = state.promptCol;
+    // (sentence is "Type the {answer} for each {prompt}")
+    renderGrid();
+    updateScore();
+  }
+
+  // ---------- Render grid ----------
+  function renderGrid() {
+    els.grid.innerHTML = '';
+    state.entries.forEach((e, i) => {
+      const pair = document.createElement('div');
+      pair.className = 'pair';
+      pair.dataset.idx = i;
+      const p = document.createElement('div'); p.className = 'prompt'; p.appendChild(makePromptEl(e.prompt));
+      const a = document.createElement('div'); a.className = 'answer empty';
+      pair.append(p, a);
+      els.grid.appendChild(pair);
+    });
+  }
+
+  function renderRow(i, opts = {}) {
+    const pair = els.grid.querySelector(`.pair[data-idx="${i}"]`);
+    if (!pair) return;
+    const ans = pair.querySelector('.answer');
+    const e = state.entries[i];
+    pair.classList.remove('just-solved', 'solved', 'revealed', 'skipped', 'wrong', 'current', 'hidden');
+    ans.classList.remove('empty');
+    ans.textContent = '';
+    if (e.solved) {
+      pair.classList.add('solved');
+      ans.textContent = e.answer;
+      if (opts.flash) pair.classList.add('just-solved');
+    } else if (e.wrong) {
+      pair.classList.add('wrong');
+      const said = document.createElement('span'); said.className = 'user-said'; said.textContent = e.wrongAnswer;
+      const correct = document.createElement('span'); correct.className = 'correct'; correct.textContent = e.answer;
+      ans.append(said, correct);
+    } else if (e.skipped) {
+      pair.classList.add('skipped');
+      ans.textContent = e.answer;
+    } else if (opts.reveal) {
+      pair.classList.add('revealed');
+      ans.textContent = e.answer;
+    } else {
+      ans.classList.add('empty');
+    }
+    // In-order: hide rows that haven't been reached yet, except the current one
+    if (state.mode === 'inorder' && !state.finished) {
+      if (i === state.currentIdx) pair.classList.add('current');
+      else if (!e.solved && !e.skipped && !e.wrong) pair.classList.add('hidden');
+    }
+  }
+
+  // ---------- Quiz mechanics ----------
+  function updateScore() {
+    const solved = state.entries.filter(e => e.solved).length;
+    const skipped = state.entries.filter(e => e.skipped).length;
+    const wrong = state.entries.filter(e => e.wrong).length;
+    let txt = `${solved} / ${state.entries.length}`;
+    if (state.mode === 'inorder') {
+      const bits = [];
+      if (wrong) bits.push(`${wrong} wrong`);
+      if (skipped) bits.push(`${skipped} skipped`);
+      if (bits.length) txt += ' · ' + bits.join(' · ');
+    }
+    els.score.textContent = txt;
+  }
+
+  function renderCurrentQuestion() {
+    if (state.mode !== 'inorder') { els.cq.classList.remove('show', 'done'); return; }
+    els.cq.classList.add('show');
+    const total = state.entries.length;
+    if (total === 0) {
+      els.cqMeta.textContent = '—';
+      els.cqPrompt.textContent = 'No entries — adjust filters in Settings.';
+      els.cqSub.textContent = '';
+      return;
+    }
+    if (state.finished) {
+      els.cq.classList.add('done');
+      els.cqMeta.textContent = 'Done';
+      els.cqPrompt.textContent = state.entries.every(e => e.solved) ? 'You got them all!' : 'Game over — see answers below.';
+      els.cqSub.textContent = '';
+      return;
+    }
+    els.cq.classList.remove('done');
+    function setPrompt(text) {
+      els.cqPrompt.innerHTML = '';
+      els.cqPrompt.appendChild(makePromptEl(text));
+    }
+    if (!state.running || state.currentIdx < 0) {
+      els.cqMeta.textContent = `Question 1 / ${total}`;
+      setPrompt(state.entries[0].prompt);
+      els.cqSub.textContent = `Click Start, then type the ${state.answerCol}`;
+      return;
+    }
+    const e = state.entries[state.currentIdx];
+    els.cqMeta.textContent = `Question ${state.currentIdx + 1} / ${total}`;
+    setPrompt(e.prompt);
+    els.cqSub.textContent = `Type the ${state.answerCol}`;
+  }
+
+  function advanceCurrent() {
+    // Move currentIdx forward to the next entry that's still open. Sets to -1 if none.
+    const start = state.currentIdx;
+    const n = state.entries.length;
+    for (let step = 1; step <= n; step++) {
+      const i = (start + step) % n;
+      const e = state.entries[i];
+      if (!e.solved && !e.skipped && !e.wrong) { state.currentIdx = i; return; }
+    }
+    state.currentIdx = -1;
+  }
+
+  function fmtTime(s) {
+    s = Math.max(0, s | 0);
+    const m = (s / 60) | 0; const r = s % 60;
+    return `${m}:${r.toString().padStart(2, '0')}`;
+  }
+
+  function setTimerClass() {
+    els.timer.classList.remove('warn', 'danger');
+    if (state.remainingSec <= 10 && state.running) els.timer.classList.add('danger');
+    else if (state.remainingSec <= 60 && state.running) els.timer.classList.add('warn');
+  }
+
+  function resetQuiz() {
+    stopTimer();
+    state.running = false;
+    state.finished = false;
+    state.remainingSec = state.durationSec;
+    state.currentIdx = -1;
+    for (const e of state.entries) { e.solved = false; e.skipped = false; e.wrong = false; e.wrongAnswer = ''; }
+    state.entries.forEach((_, i) => renderRow(i));
+    updateScore();
+    els.timer.textContent = fmtTime(state.remainingSec);
+    setTimerClass();
+    els.input.value = '';
+    els.input.disabled = state.entries.length === 0;
+    els.input.placeholder = state.entries.length === 0 ? 'No entries — adjust filters' : 'Click here to start…';
+    els.startBtn.textContent = 'Start';
+    els.startBtn.disabled = state.entries.length === 0;
+    els.giveupBtn.disabled = true;
+    // Show/hide in-order UI
+    const inOrder = state.mode === 'inorder';
+    els.skipBtn.hidden = !inOrder;
+    els.skipBtn.disabled = true;
+    els.promptText.style.display = inOrder ? 'none' : '';
+    // Subset banner reflects whether we're practicing last round's mistakes
+    if (state.subsetMode) {
+      els.subsetBanner.classList.add('show');
+      els.subsetCount.textContent = state.entries.length;
+    } else {
+      els.subsetBanner.classList.remove('show');
+    }
+    renderCurrentQuestion();
+    renderReview();
+  }
+
+  function startQuiz() {
+    if (state.entries.length === 0) return;
+    state.running = true;
+    state.finished = false;
+    els.input.disabled = false;
+    els.input.placeholder = `Type a ${state.answerCol}…`;
+    els.input.focus();
+    els.startBtn.textContent = 'Restart';
+    els.giveupBtn.disabled = false;
+    if (state.mode === 'inorder') {
+      state.currentIdx = 0;
+      els.skipBtn.disabled = false;
+      // re-render all rows so the current one is highlighted and others hidden
+      state.entries.forEach((_, i) => renderRow(i));
+      renderCurrentQuestion();
+      scrollCurrentIntoView();
+    }
+    startTimer();
+  }
+
+  function scrollCurrentIntoView() {
+    if (state.currentIdx < 0) return;
+    const pair = els.grid.querySelector(`.pair[data-idx="${state.currentIdx}"]`);
+    if (pair) pair.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+
+  function startTimer() {
+    stopTimer();
+    state.intervalId = setInterval(() => {
+      state.remainingSec--;
+      els.timer.textContent = fmtTime(state.remainingSec);
+      setTimerClass();
+      if (state.remainingSec <= 0) endQuiz(false);
+    }, 1000);
+  }
+  function stopTimer() {
+    if (state.intervalId) { clearInterval(state.intervalId); state.intervalId = null; }
+  }
+
+  function endQuiz(won) {
+    stopTimer();
+    state.running = false;
+    state.finished = true;
+    state.currentIdx = -1;
+    els.input.disabled = true;
+    els.input.value = '';
+    els.input.placeholder = won ? 'You got them all!' : 'Time / game over — see the answers below.';
+    els.giveupBtn.disabled = true;
+    els.skipBtn.disabled = true;
+    setTimerClass();
+    state.entries.forEach((e, i) => {
+      if (!e.solved && !e.skipped && !e.wrong) renderRow(i, { reveal: true });
+      else renderRow(i);  // re-render to drop .current/.hidden classes
+    });
+    renderCurrentQuestion();
+    renderReview();
+  }
+
+  els.startBtn.addEventListener('click', () => {
+    if (state.running) {
+      // restart
+      resetQuiz();
+      startQuiz();
+    } else {
+      // either fresh or finished — reset & start
+      resetQuiz();
+      startQuiz();
+    }
+  });
+  els.giveupBtn.addEventListener('click', () => {
+    if (!state.running) return;
+    if (confirm('Give up and reveal remaining answers?')) endQuiz(false);
+  });
+
+  els.skipBtn.addEventListener('click', () => {
+    if (!state.running || state.mode !== 'inorder') return;
+    if (state.currentIdx < 0) return;
+    const i = state.currentIdx;
+    state.entries[i].skipped = true;
+    renderRow(i);
+    advanceCurrent();
+    if (state.currentIdx === -1) {
+      // all done (all answered or skipped)
+      endQuiz(state.entries.every(e => e.solved));
+      return;
+    }
+    renderRow(state.currentIdx);
+    renderCurrentQuestion();
+    updateScore();
+    scrollCurrentIntoView();
+    els.input.value = '';
+    els.input.focus();
+  });
+
+  // Click/focus the input before the quiz has started → start it.
+  els.input.addEventListener('focus', () => {
+    if (!state.running && !state.finished && state.entries.length > 0) startQuiz();
+  });
+
+  els.input.addEventListener('input', () => {
+    if (!state.running) return;
+    const raw = els.input.value;
+    if (!raw.trim()) return;
+    const norm = normalize(raw);
+    if (!norm) return;
+
+    if (state.mode === 'inorder') {
+      // Only the current question is matchable
+      if (state.currentIdx < 0) return;
+      const e = state.entries[state.currentIdx];
+      if (e.accepted.has(norm)) {
+        e.solved = true;
+        renderRow(state.currentIdx, { flash: true });
+        advanceCurrent();
+        if (state.currentIdx === -1) {
+          endQuiz(state.entries.every(x => x.solved));
+        } else {
+          renderRow(state.currentIdx);
+          renderCurrentQuestion();
+          scrollCurrentIntoView();
+        }
+        els.input.value = '';
+        updateScore();
+      }
+      return;
+    }
+
+    // Free mode
+    const matches = state.variantIndex.get(norm);
+    if (matches) {
+      let anyNew = false;
+      for (const i of matches) {
+        if (!state.entries[i].solved) {
+          state.entries[i].solved = true;
+          renderRow(i, { flash: true });
+          anyNew = true;
+        }
+      }
+      if (anyNew) {
+        els.input.value = '';
+        updateScore();
+        if (state.entries.every(e => e.solved)) endQuiz(true);
+      }
+    }
+  });
+
+  // Enter key: try fuzzy matching for typo tolerance, then (in-order) record wrong if no match.
+  els.input.addEventListener('keydown', ev => {
+    if (ev.key !== 'Enter') return;
+    if (!state.running) return;
+    const trimmed = els.input.value.trim();
+    if (!trimmed) return;
+    const norm = normalize(trimmed);
+
+    if (state.mode === 'inorder') {
+      if (state.currentIdx < 0) return;
+      const e = state.entries[state.currentIdx];
+      if (e.accepted.has(norm)) return; // exact: handled by input listener
+
+      const fuzzy = findFuzzyMatch(norm, [e]);
+      ev.preventDefault();
+      if (fuzzy) {
+        e.solved = true;
+        renderRow(state.currentIdx, { flash: true });
+      } else {
+        e.wrong = true;
+        e.wrongAnswer = trimmed;
+        renderRow(state.currentIdx);
+      }
+      advanceCurrent();
+      if (state.currentIdx === -1) {
+        endQuiz(state.entries.every(x => x.solved));
+      } else {
+        renderRow(state.currentIdx);
+        renderCurrentQuestion();
+        scrollCurrentIntoView();
+      }
+      els.input.value = '';
+      updateScore();
+      return;
+    }
+
+    // Free mode: Enter triggers fuzzy across all unsolved entries.
+    if (state.variantIndex.has(norm)) return; // exact: handled by input listener
+    const fuzzy = findFuzzyMatch(norm, state.entries.filter(x => !x.solved));
+    if (fuzzy) {
+      ev.preventDefault();
+      const i = state.entries.indexOf(fuzzy);
+      fuzzy.solved = true;
+      renderRow(i, { flash: true });
+      els.input.value = '';
+      updateScore();
+      if (state.entries.every(x => x.solved)) endQuiz(true);
+    }
+  });
+
+  // ---------- End-of-quiz review ----------
+  function renderReview() {
+    const wrong = state.entries.filter(e => e.wrong);
+    const skipped = state.entries.filter(e => e.skipped);
+    const missed = state.entries.filter(e => !e.solved && !e.wrong && !e.skipped);
+    if (!state.finished || (!wrong.length && !skipped.length && !missed.length)) {
+      els.review.hidden = true;
+      els.review.innerHTML = '';
+      return;
+    }
+    els.review.hidden = false;
+    els.review.innerHTML = '';
+    const header = document.createElement('h3');
+    const correct = state.entries.filter(e => e.solved).length;
+    header.textContent = `Review — ${correct} / ${state.entries.length} correct`;
+    els.review.appendChild(header);
+
+    // "Retry just my mistakes" — restarts the quiz with only the wrong/skipped/missed entries.
+    const missedCount = wrong.length + skipped.length + missed.length;
+    if (missedCount > 0) {
+      const retry = document.createElement('button');
+      retry.className = 'retry';
+      retry.textContent = `Retry just my mistakes (${missedCount})`;
+      retry.addEventListener('click', startRetryMistakes);
+      els.review.appendChild(retry);
+    }
+
+    function group(title, items, render) {
+      if (!items.length) return;
+      const g = document.createElement('div'); g.className = 'group';
+      const h = document.createElement('div'); h.style.fontWeight = '600'; h.style.marginBottom = '0.3rem';
+      h.textContent = `${title} (${items.length})`;
+      g.appendChild(h);
+      const ul = document.createElement('ul');
+      for (const e of items) {
+        const li = document.createElement('li');
+        const p = document.createElement('div'); p.className = 'p'; p.appendChild(makePromptEl(e.prompt));
+        const a = document.createElement('div'); a.className = 'a';
+        render(a, e);
+        li.append(p, a);
+        ul.appendChild(li);
+      }
+      g.appendChild(ul);
+      els.review.appendChild(g);
+    }
+
+    group('Wrong answers', wrong, (a, e) => {
+      const t = document.createElement('span'); t.className = 'typed'; t.textContent = e.wrongAnswer;
+      const c = document.createElement('span'); c.className = 'correct'; c.textContent = e.answer;
+      a.append(t, c);
+    });
+    group('Skipped', skipped, (a, e) => {
+      const c = document.createElement('span'); c.className = 'skip'; c.textContent = e.answer;
+      a.appendChild(c);
+    });
+    group('Unanswered (time up)', missed, (a, e) => {
+      const c = document.createElement('span'); c.className = 'skip'; c.textContent = e.answer;
+      a.appendChild(c);
+    });
+  }
+
+  // ---------- File picker ----------
+  els.csvFile.addEventListener('change', () => {
+    const file = els.csvFile.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => loadCSVText(reader.result, file.name);
+    reader.readAsText(file);
+  });
+  // ---------- Quiz registry routing ----------
+  function getActiveQuiz() {
+    const params = new URLSearchParams(location.search);
+    const id = params.get('topic') || 'capitals';
+    const reg = window.QUIZZES || {};
+    return reg[id] || null;
+  }
+
+  els.reloadDefault.addEventListener('click', () => {
+    const q = getActiveQuiz();
+    if (q) loadCSVText(q.embeddedCSV, q.csvName, { defaultPrompt: q.defaultPrompt, defaultAnswer: q.defaultAnswer });
+    els.csvFile.value = '';
+  });
+
+  // ---------- Init ----------
+  function init() {
+    const q = getActiveQuiz();
+    if (q) {
+      document.title = `${q.title} — Quick Quiz`;
+      els.topicTitle.textContent = q.title;
+      loadCSVText(q.embeddedCSV, q.csvName, { defaultPrompt: q.defaultPrompt, defaultAnswer: q.defaultAnswer });
+    } else {
+      // Custom / unknown topic: ask user to load a CSV
+      const params = new URLSearchParams(location.search);
+      const requested = params.get('topic');
+      document.title = 'Custom quiz — Quick Quiz';
+      els.topicTitle.textContent = requested === 'custom' ? 'Custom quiz' : 'Quick Quiz';
+      els.csvInfo.textContent = requested && requested !== 'custom'
+        ? `Unknown quiz "${requested}". Load your own CSV below.`
+        : 'Load a CSV below to start.';
+      els.filename.textContent = 'no CSV loaded';
+      openSettings();
+    }
+  }
+  init();
+  </script>
+</body>
+</html>
