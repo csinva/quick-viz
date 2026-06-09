@@ -410,6 +410,7 @@
     subsetMode: false,         // true when practicing only last round's mistakes
     subsetKeys: null,          // Set<string> of "promptanswer" allowed in subset mode
     currentIdx: -1,            // active question index in in-order mode
+    answerCounter: 0,          // monotonic; stamps e.answeredAt so in-order grid sorts newest-first
     durationSec: 15 * 60,
     remainingSec: 15 * 60,
     running: false,
@@ -631,6 +632,9 @@
     els.filters.appendChild(wrap);
   }
 
+  // Stamp the order in which entries get answered — used to float newest-first in the in-order grid.
+  function stampAnswered(e) { if (!e.answeredAt) e.answeredAt = ++state.answerCounter; }
+
   // ---------- Subset mode (retry mistakes) ----------
   function subsetKey(prompt, answer) { return prompt + '' + answer; }
   function startRetryMistakes() {
@@ -675,7 +679,7 @@
           for (const v of variantsOf(t)) accepted.add(v);
         }
       }
-      entries.push({ prompt, answer, solved: false, skipped: false, wrong: false, wrongAnswer: '', accepted });
+      entries.push({ prompt, answer, solved: false, skipped: false, wrong: false, wrongAnswer: '', answeredAt: 0, accepted });
     }
     if (state.order === 'alpha') {
       // When prompts are images, sort alphabetically by the answer instead of by the file path.
@@ -751,10 +755,18 @@
     } else {
       ans.classList.add('empty');
     }
-    // In-order: hide rows that haven't been reached yet, except the current one
+    // In-order: hide rows that haven't been reached yet, pin current to the top,
+    // and float the most recently answered above older ones.
+    pair.style.order = '';
     if (state.mode === 'inorder' && !state.finished) {
-      if (i === state.currentIdx) pair.classList.add('current');
-      else if (!e.solved && !e.skipped && !e.wrong) pair.classList.add('hidden');
+      if (i === state.currentIdx) {
+        pair.classList.add('current');
+        pair.style.order = '-1000000';
+      } else if (!e.solved && !e.skipped && !e.wrong) {
+        pair.classList.add('hidden');
+      } else if (e.answeredAt) {
+        pair.style.order = String(-e.answeredAt);
+      }
     }
   }
 
@@ -837,7 +849,8 @@
     state.finished = false;
     state.remainingSec = state.durationSec;
     state.currentIdx = -1;
-    for (const e of state.entries) { e.solved = false; e.skipped = false; e.wrong = false; e.wrongAnswer = ''; }
+    for (const e of state.entries) { e.solved = false; e.skipped = false; e.wrong = false; e.wrongAnswer = ''; e.answeredAt = 0; }
+    state.answerCounter = 0;
     state.entries.forEach((_, i) => renderRow(i));
     updateScore();
     els.timer.textContent = fmtTime(state.remainingSec);
@@ -943,8 +956,9 @@
     if (state.currentIdx < 0) return;
     const i = state.currentIdx;
     state.entries[i].skipped = true;
-    renderRow(i);
+    stampAnswered(state.entries[i]);
     advanceCurrent();
+    renderRow(i);
     if (state.currentIdx === -1) {
       // all done (all answered or skipped)
       endQuiz(state.entries.every(e => e.solved));
@@ -976,8 +990,10 @@
       const e = state.entries[state.currentIdx];
       if (e.accepted.has(norm)) {
         e.solved = true;
-        renderRow(state.currentIdx, { flash: true });
+        stampAnswered(e);
+        const prevIdx = state.currentIdx;
         advanceCurrent();
+        renderRow(prevIdx, { flash: true });
         if (state.currentIdx === -1) {
           endQuiz(state.entries.every(x => x.solved));
         } else {
@@ -998,6 +1014,7 @@
       for (const i of matches) {
         if (!state.entries[i].solved) {
           state.entries[i].solved = true;
+          stampAnswered(state.entries[i]);
           renderRow(i, { flash: true });
           anyNew = true;
         }
@@ -1025,15 +1042,17 @@
 
       const fuzzy = findFuzzyMatch(norm, [e]);
       ev.preventDefault();
+      const prevIdx = state.currentIdx;
       if (fuzzy) {
         e.solved = true;
-        renderRow(state.currentIdx, { flash: true });
+        stampAnswered(e);
       } else {
         e.wrong = true;
         e.wrongAnswer = trimmed;
-        renderRow(state.currentIdx);
+        stampAnswered(e);
       }
       advanceCurrent();
+      renderRow(prevIdx, fuzzy ? { flash: true } : {});
       if (state.currentIdx === -1) {
         endQuiz(state.entries.every(x => x.solved));
       } else {
@@ -1053,6 +1072,7 @@
       ev.preventDefault();
       const i = state.entries.indexOf(fuzzy);
       fuzzy.solved = true;
+      stampAnswered(fuzzy);
       renderRow(i, { flash: true });
       els.input.value = '';
       updateScore();
