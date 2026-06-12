@@ -2,12 +2,131 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="0; url=quick-data/index.html">
-<link rel="canonical" href="quick-data/index.html">
-<title>Redirecting…</title>
-<script>location.replace("quick-data/index.html" + location.search + location.hash);</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Spectra — interactive maps of pop catalogs</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background: radial-gradient(1100px 600px at 30% -10%, #2a1f47 0%, #0d0b14 55%),
+                radial-gradient(900px 500px at 90% 110%, #3a1525 0%, transparent 60%), #0d0b14;
+    color: #f2eefa;
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 48px 20px;
+  }
+  .stars { position: fixed; inset: 0; pointer-events: none; }
+  .stars span {
+    position: absolute; width: 2px; height: 2px; border-radius: 50%;
+    background: #fff; opacity: .5; animation: tw 3s ease-in-out infinite alternate;
+  }
+  @keyframes tw { from { opacity: .12; } to { opacity: .7; } }
+
+  header { text-align: center; margin-bottom: 44px; }
+  h1 {
+    font-size: clamp(34px, 6vw, 58px); font-weight: 800; letter-spacing: -0.02em;
+    background: linear-gradient(90deg, #f6c4e1, #c9b8ff 40%, #9fd8ff 75%, #ffe2a8);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .tag { color: #9b93ad; margin-top: 10px; font-size: 16px; }
+
+  .cards { display: flex; gap: 26px; flex-wrap: wrap; justify-content: center; max-width: 1000px; }
+  .card {
+    position: relative; display: block; text-decoration: none; color: inherit;
+    width: 420px; max-width: 92vw; border-radius: 22px; padding: 30px 30px 26px;
+    border: 1px solid #2e2845; overflow: hidden;
+    transition: transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s, border-color .25s;
+  }
+  .card:hover { transform: translateY(-6px) scale(1.015); border-color: #ffffff44; }
+  .card.taylor {
+    background: linear-gradient(150deg, #241b3a 0%, #14101f 55%, #1d1430 100%);
+    box-shadow: 0 22px 60px rgba(110, 70, 200, .25);
+  }
+  .card.taylor:hover { box-shadow: 0 30px 80px rgba(150, 100, 255, .4); }
+  .card.olivia {
+    background: linear-gradient(150deg, #321526 0%, #15101c 55%, #2a1230 100%);
+    box-shadow: 0 22px 60px rgba(210, 60, 110, .22);
+  }
+  .card.olivia:hover { box-shadow: 0 30px 80px rgba(230, 80, 130, .38); }
+  .card .glow {
+    position: absolute; top: -60px; right: -60px; width: 180px; height: 180px;
+    border-radius: 50%; filter: blur(50px); opacity: .5;
+  }
+  .taylor .glow { background: #8b5cf6; }
+  .olivia .glow { background: #e0356e; }
+  .who { font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #9b93ad; }
+  .card h2 { font-size: 28px; font-weight: 800; margin: 8px 0 10px; }
+  .taylor h2 { color: #d9c9ff; }
+  .olivia h2 { color: #ff9fb8; }
+  .desc { color: #b7add0; font-size: 14px; line-height: 1.65; min-height: 70px; }
+  .eras { display: flex; gap: 5px; margin: 18px 0 14px; }
+  .eras i { height: 8px; border-radius: 8px; flex: 1; opacity: .85; }
+  .meta { display: flex; gap: 14px; flex-wrap: wrap; color: #8d84a8; font-size: 12.5px; }
+  .meta b { color: #e8def8; }
+  .go {
+    margin-top: 20px; display: inline-block; font-weight: 800; font-size: 14px;
+    color: #fff; padding: 10px 20px; border-radius: 999px;
+  }
+  .taylor .go { background: linear-gradient(90deg, #6d4fc2, #a64fc2); box-shadow: 0 0 18px rgba(150,100,255,.4); }
+  .olivia .go { background: linear-gradient(90deg, #c2275a, #e0356e); box-shadow: 0 0 18px rgba(230,80,130,.4); }
+
+  footer { margin-top: 46px; color: #564e6e; font-size: 12.5px; text-align: center; line-height: 1.7; }
+</style>
 </head>
-<body style="background:#0d0b14;color:#9b93ad;font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh">
-<p>Redirecting to <a href="quick-data/index.html" style="color:#c9b8ff">quick-data/index.html</a>…</p>
+<body>
+<div class="stars" id="stars"></div>
+
+<header>
+  <h1>The Spectra</h1>
+  <div class="tag">Interactive maps of entire pop catalogs — every song scored, plotted, and playable. Plus your aura.</div>
+</header>
+
+<div class="cards">
+  <a class="card taylor" href="taylor.html">
+    <div class="glow"></div>
+    <div class="who">Taylor Swift</div>
+    <h2>The Swiftie Spectrum</h2>
+    <div class="desc">All 252 songs — every album track, vault track, and loose single from the 2006 debut to last week — across happiness, heartbreak, vengeance, country-ness, and more.</div>
+    <div class="eras">
+      <i style="background:#6fae4e"></i><i style="background:#e8b647"></i><i style="background:#a05cc8"></i>
+      <i style="background:#d6453c"></i><i style="background:#5dade2"></i><i style="background:#9aa0a6"></i>
+      <i style="background:#f48fb1"></i><i style="background:#cfcabd"></i><i style="background:#b56a32"></i>
+      <i style="background:#7b8cde"></i><i style="background:#efe9d6"></i><i style="background:#ff8c42"></i>
+    </div>
+    <div class="meta"><span><b>252</b> songs</span><span><b>13</b> eras</span><span><b>10</b> metrics</span><span><b>🔮</b> aura readings</span></div>
+    <span class="go">Enter the multiverse →</span>
+  </a>
+
+  <a class="card olivia" href="olivia.html">
+    <div class="glow"></div>
+    <div class="who">Olivia Rodrigo</div>
+    <h2>The Rodrigo Spectrum</h2>
+    <div class="desc">All 43 songs — SOUR, GUTS (spilled), the brand-new <i>you seem pretty sad for a girl so in love</i>, and the soundtrack era — mapped from serene to scorched-earth.</div>
+    <div class="eras">
+      <i style="background:#b18cff"></i><i style="background:#d63b5e"></i><i style="background:#e8927c"></i><i style="background:#3fb8af"></i>
+    </div>
+    <div class="meta"><span><b>43</b> songs</span><span><b>4</b> eras</span><span><b>9</b> metrics</span><span><b>🔮</b> aura readings</span></div>
+    <span class="go">Spill your guts →</span>
+  </a>
+</div>
+
+<footer>
+  Hand-annotated by Claude · streams &amp; lengths via the iTunes catalog and kworb.net · hover any dot inside to play the song.<br>
+  Your aura is computed locally from your picks. The stars are decorative. Probably.
+</footer>
+
+<script>
+  const stars = document.getElementById("stars");
+  let h = 0;
+  for (let i = 0; i < 70; i++) {
+    const s = document.createElement("span");
+    h = (h * 1664525 + 1013904223) % 4294967296;
+    s.style.left = (h % 1000) / 10 + "%";
+    h = (h * 1664525 + 1013904223) % 4294967296;
+    s.style.top = (h % 1000) / 10 + "%";
+    s.style.animationDelay = (i % 30) / 10 + "s";
+    stars.appendChild(s);
+  }
+</script>
 </body>
 </html>
