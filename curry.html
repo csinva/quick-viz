@@ -405,7 +405,7 @@
 <div class="wrap">
   <header>
     <h1>The Curry Spectrum</h1>
-    <div class="sub"><b>42 curries</b> — from korma to phaal, Chiang Mai to Glasgow. Pick one dimension per axis, filter by tradition, and hover any dot for the tasting card.</div>
+    <div class="sub"><b>151 curries</b> — from korma to phaal, Bengal to Addis Ababa, Chiang Mai to Glasgow. Pick one dimension per axis, filter by tradition, and hover any dot for the tasting card.</div>
   </header>
 
   <nav class="tabs">
@@ -449,7 +449,7 @@
 
   <footer>
     Every dimension is Claude-annotated opinion (0–100) except cook times and spice counts, which are honest estimates for classic versions.<br>
-    42 curries across six traditions, chosen for spread and outliers: rendang anchors dry, rasam anchors soupy, phaal anchors regret, and currywurst is here over the objections of several nations.<br>
+    151 curries across eight traditions, chosen for spread and outliers: rendang anchors dry, rasam anchors soupy, phaal anchors regret, and currywurst is here over the objections of several nations.<br>
     Hover a dot for the tasting card — recipe videos via YouTube.
   </footer>
 </div>
@@ -461,12 +461,14 @@ const ART = {};
 
 // ---------------- albums & colors ----------------
 const ALBUMS = {
-  "North India":       { c: "#e8b647", y: "ghee, cream, empire", t: "N. India" },
-  "South India":       { c: "#6fae4e", y: "tamarind & curry leaves", t: "S. India" },
-  "Thailand":          { c: "#3fb8af", y: "balance as religion", t: "Thai" },
-  "SE Asia & Islands": { c: "#c97a3d", y: "lemongrass & patience", t: "SEA" },
-  "East Asia":         { c: "#7b8cde", y: "comfort engineering", t: "E. Asia" },
-  "Diaspora & Fusion": { c: "#d6453c", y: "curry with a passport", t: "fusion" },
+  "North India":          { c: "#e8b647", y: "ghee, cream, empire", t: "N. India" },
+  "South India":          { c: "#6fae4e", y: "tamarind & curry leaves", t: "S. India" },
+  "East & Bengal":        { c: "#d4658f", y: "mustard, fish & five-spice", t: "Bengal" },
+  "Thailand":             { c: "#3fb8af", y: "balance as religion", t: "Thai" },
+  "SE Asia & Islands":    { c: "#c97a3d", y: "lemongrass & patience", t: "SEA" },
+  "East Asia":            { c: "#7b8cde", y: "comfort engineering", t: "E. Asia" },
+  "Persia, Arabia & Africa": { c: "#a78bd0", y: "saffron, dried lime & berbere", t: "Persia/Afr" },
+  "Diaspora & Fusion":    { c: "#d6453c", y: "curry with a passport", t: "fusion" },
 };
 
 // ---------------- metrics ----------------
@@ -538,6 +540,131 @@ const SONGS = [
 ["Cape Malay Chicken Curry", "Diaspora & Fusion", 35, 45, 50, 35, 55, 75, 40, 75, 75, 13, "Sweet-spiced Cape Town heritage, generations deep.", "gNbffMJ0-9k"],
 ["Currywurst", "Diaspora & Fusion", 20, 5, 65, 40, 30, 60, 65, 0, 15, 6, "Germany's ketchup-curry sausage. The least curry curry; we plot it anyway.", "wFRd6Z9QpGY"],
 ["Chip-Shop Curry Sauce", "Diaspora & Fusion", 15, 30, 55, 10, 75, 70, 45, 0, 10, 5, "Britain's neon chip lubricant. Spiritually a curry, legally a sauce.", "28gxiUJ-FMg"],
+
+// ---- North India (expanded) ----
+["Malai Kofta", "North India", 20, 90, 45, 20, 55, 88, 70, 65, 60, 14, "Fried paneer-and-potato dumplings bobbing in a cashew gravy sweet enough to end an argument.", ""],
+["Shahi Paneer", "North India", 18, 88, 55, 20, 50, 85, 68, 60, 40, 13, "Mughlai 'royal' paneer — cream, nuts, and a saffron budget.", ""],
+["Kashmiri Dum Aloo", "North India", 55, 60, 25, 35, 55, 78, 50, 65, 60, 15, "Baby potatoes pricked, fried, and simmered in a fennel-ginger yogurt gravy the colour of a Kashmiri autumn.", ""],
+["Rajma", "North India", 35, 35, 20, 35, 60, 90, 65, 90, 90, 12, "Kidney beans and rice — the Sunday lunch that raised half of North India.", ""],
+["Aloo Gobi", "North India", 35, 10, 15, 25, 20, 80, 75, 55, 35, 10, "Potato and cauliflower, turmeric-yellow and dry — the lunchbox that never lets you down.", ""],
+["Matar Paneer", "North India", 30, 55, 35, 30, 55, 82, 72, 65, 35, 12, "Peas and paneer in a tomato gravy — the dependable Tuesday of Punjabi cooking.", ""],
+["Nihari", "North India", 55, 25, 15, 20, 65, 88, 60, 30, 420, 20, "Shank meat simmered from midnight to dawn; breakfast for emperors and night-shift workers alike.", ""],
+["Laal Maas", "North India", 90, 20, 10, 30, 55, 70, 55, 70, 90, 14, "Rajasthani red mutton dyed and detonated by Mathania chillies — heat as a hunting trophy.", ""],
+["Methi Malai Murg", "North India", 25, 80, 35, 15, 50, 82, 50, 60, 45, 13, "Fenugreek's pleasant bitterness folded into cream — the curry that tastes like a cashmere scarf.", ""],
+["Kadhi Pakora", "North India", 30, 55, 30, 70, 75, 85, 60, 95, 60, 11, "Yogurt-and-gram-flour curry studded with fritters; sour, soothing, and rice's closest ally.", ""],
+["Baingan Bharta", "North India", 40, 15, 20, 30, 25, 78, 60, 55, 45, 10, "Eggplant charred over open flame, then mashed into smoky submission.", ""],
+["Mughlai Chicken", "North India", 30, 80, 40, 20, 55, 84, 55, 65, 60, 16, "Chicken drowned in a court of almonds, cream, and saffron — subtlety with a crown.", ""],
+["Sarson da Saag", "North India", 30, 25, 15, 20, 50, 88, 58, 20, 120, 9, "Slow-cooked mustard greens crowned with butter, married for life to makki di roti.", ""],
+["Achari Gosht", "North India", 60, 25, 15, 65, 55, 72, 45, 70, 90, 16, "Mutton cooked with the whole pickle spice drawer — nigella, fennel, mustard, fenugreek, mischief.", ""],
+["Keema Matar", "North India", 45, 25, 20, 25, 40, 85, 62, 65, 45, 13, "Minced meat and peas — the curry that fills parathas and pav alike.", ""],
+["Tariwala Chicken", "North India", 50, 20, 15, 30, 80, 86, 50, 75, 45, 12, "Home-style thin-gravy chicken — no cream, no cashews, just the curry your grandmother actually makes.", ""],
+["Paneer Do Pyaza", "North India", 35, 45, 30, 30, 45, 78, 55, 60, 40, 12, "Paneer with onions twice over — diced into the gravy and again on top, because once was not enough.", ""],
+
+// ---- South India (expanded) ----
+["Hyderabadi Haleem", "South India", 40, 30, 15, 25, 50, 90, 60, 25, 360, 18, "Wheat, lentils, and meat pounded for hours into a Ramadan paste rich enough to fast on.", ""],
+["Bagara Baingan", "South India", 50, 35, 25, 55, 55, 75, 55, 75, 50, 16, "Hyderabadi eggplant in a peanut-sesame-tamarind gravy built to flank a biryani.", ""],
+["Gongura Mutton", "South India", 80, 15, 10, 75, 45, 72, 45, 80, 75, 14, "Andhra sorrel leaves turn this mutton fiery and tart — sourness as a personality trait.", ""],
+["Andhra Kodi Kura", "South India", 85, 20, 10, 35, 55, 75, 50, 85, 50, 15, "Andhra chicken curry, calibrated for people who find Madras a little timid.", ""],
+["Kerala Beef Ularthiyathu", "South India", 65, 25, 10, 25, 15, 82, 55, 50, 75, 16, "Beef slow-roasted with coconut chips and curry leaves until dark, glossy, and faintly illegal in Kerala's better stories.", ""],
+["Mambazha Pulissery", "South India", 25, 60, 60, 60, 70, 80, 35, 80, 30, 9, "Ripe mango simmered in coconut-yogurt — Kerala's sweet-sour-savoury tightrope.", ""],
+["Meen Moilee", "South India", 25, 75, 20, 40, 70, 80, 50, 75, 30, 11, "A gentle coconut-milk fish stew, pale gold and turmeric-soft — the Kerala cousin who never raises their voice.", ""],
+["Theeyal", "South India", 50, 40, 25, 65, 60, 75, 35, 80, 45, 13, "Roasted coconut ground dark and brown, then soured with tamarind — Kerala's most underrated gravy.", ""],
+["Erissery", "South India", 25, 65, 35, 20, 50, 80, 35, 75, 40, 9, "Pumpkin and beans in coconut, finished with a toasted-coconut crackle — Onam sadhya royalty.", ""],
+["Mangalorean Ghee Roast", "South India", 75, 25, 20, 50, 25, 80, 55, 60, 50, 15, "Byadgi-chilli paste fried in ghee until it clings to the chicken like a sunset. Sticky, fiery, unforgettable.", ""],
+["Kori Gassi", "South India", 70, 70, 15, 40, 70, 80, 45, 85, 50, 16, "Mangalore's coconut chicken curry, eaten with rice-flour roti and zero regret.", ""],
+["Coorg Pandi Curry", "South India", 70, 15, 15, 70, 50, 78, 40, 75, 75, 14, "Coorg pork blackened with kachampuli vinegar — sour, dark, and proudly from the hills.", ""],
+["Mirchi ka Salan", "South India", 65, 40, 25, 60, 55, 70, 45, 70, 50, 16, "Whole green chillies swimming in peanut-sesame-tamarind gravy; biryani's loyal bodyguard.", ""],
+["Kerala Ishtu", "South India", 15, 75, 25, 15, 75, 85, 50, 60, 40, 8, "A whisper-mild coconut-milk stew for chicken or vegetables, ladled over appams at Sunday breakfast.", ""],
+["Karnataka Saagu", "South India", 35, 55, 25, 30, 65, 78, 40, 55, 35, 12, "Bangalore's coconut-and-poppyseed veg curry, the rava idli's chosen companion.", ""],
+
+// ---- East & Bengal ----
+["Macher Jhol", "East & Bengal", 35, 10, 15, 35, 80, 85, 55, 90, 35, 9, "Bengal's everyday fish curry — light, ginger-bright, and ladled over rice every single day.", ""],
+["Shorshe Ilish", "East & Bengal", 40, 20, 10, 30, 65, 82, 55, 90, 30, 8, "Hilsa in a pungent mustard gravy that makes Bengalis weep with both joy and sinus pain.", ""],
+["Chingri Malai Curry", "East & Bengal", 25, 85, 35, 15, 60, 85, 55, 85, 40, 11, "Prawns bathed in coconut milk — the wedding-feast flex of Bengali kitchens.", ""],
+["Kosha Mangsho", "East & Bengal", 50, 25, 20, 25, 35, 88, 55, 80, 120, 16, "Mutton slow-fried in its own spices until dark and glossy — Sunday lunch as a love language.", ""],
+["Aloo Posto", "East & Bengal", 20, 25, 15, 10, 25, 85, 45, 85, 35, 6, "Potatoes in a poppyseed paste — proof Bengal can make magic from almost nothing.", ""],
+["Doi Maach", "East & Bengal", 30, 50, 25, 55, 60, 80, 45, 85, 35, 11, "Fish in spiced yogurt — tangy, gentle, and old as the zamindars.", ""],
+["Chanar Dalna", "East & Bengal", 30, 40, 25, 25, 55, 78, 35, 75, 45, 12, "Bengali cottage-cheese dumplings in a light potato gravy — the vegetarian feast-day centrepiece.", ""],
+["Shukto", "East & Bengal", 15, 40, 25, 15, 55, 72, 35, 80, 45, 11, "A bittersweet mixed-vegetable curry served first, to wake the palate up — bitter gourd and all.", ""],
+["Bangladeshi Beef Bhuna", "East & Bengal", 60, 15, 15, 25, 30, 85, 50, 80, 90, 16, "Beef fried down with onions until the masala turns to lacquer — Dhaka's wedding-tent staple.", ""],
+["Mezbani Beef", "East & Bengal", 80, 15, 10, 30, 60, 80, 40, 80, 120, 18, "Chittagong's fiery communal beef curry, cooked in vats and served to entire neighbourhoods.", ""],
+["Odia Dalma", "East & Bengal", 25, 15, 20, 20, 65, 82, 30, 85, 50, 9, "Odisha's lentils-and-vegetables temple food, tempered with cumin and a holy restraint.", ""],
+["Mansa Tarkari", "East & Bengal", 55, 15, 15, 25, 65, 80, 30, 80, 75, 13, "Odia mutton curry with potato — Sunday's reward, thin-gravied and pepper-warm.", ""],
+["Masor Tenga", "East & Bengal", 25, 5, 10, 80, 80, 78, 35, 85, 30, 7, "Assam's sour fish curry, tartened with tomato, lemon, or elephant-apple — summer in a bowl.", ""],
+["Assamese Duck Curry", "East & Bengal", 45, 20, 15, 40, 55, 78, 30, 75, 90, 12, "Duck simmered with ash gourd and whole spices — a winter-festival bird with gravitas.", ""],
+["Khasi ko Masu", "East & Bengal", 55, 15, 10, 25, 70, 82, 40, 80, 75, 13, "Nepali goat curry, peppery and brothy, the heart of every Dashain feast.", ""],
+["Aloo Tama", "East & Bengal", 45, 10, 10, 65, 80, 78, 30, 80, 50, 11, "Sour bamboo shoots, potatoes, and black-eyed peas — Nepal's funkiest, most addictive bowl.", ""],
+["Axone Pork", "East & Bengal", 65, 5, 5, 30, 45, 72, 25, 85, 75, 9, "Naga pork with fermented soybean and bamboo shoot — pungent enough to clear a room, beloved enough to fill one.", ""],
+
+// ---- Thailand (expanded) ----
+["Gaeng Som", "Thailand", 75, 0, 25, 90, 85, 65, 45, 80, 35, 10, "Thailand's sour orange curry — no coconut, no mercy, all tamarind and chilli.", ""],
+["Gaeng Hung Lay", "Thailand", 45, 20, 45, 50, 50, 82, 45, 70, 120, 16, "Northern Thai pork-belly curry, Burmese-influenced, ginger-bright and tamarind-sticky.", ""],
+["Choo Chee", "Thailand", 55, 80, 40, 25, 35, 78, 50, 70, 25, 12, "A thick red curry reduced to a glaze, draped over crispy fish — the curry that learned to cling.", ""],
+["Gaeng Tai Pla", "Thailand", 90, 10, 15, 45, 70, 55, 30, 85, 45, 14, "Southern Thailand's fermented fish-gut curry — pungent, ferocious, and not seeking your approval.", ""],
+["Khua Kling", "Thailand", 95, 5, 10, 25, 5, 60, 40, 90, 25, 13, "Bone-dry minced-meat curry from the south, fried with a chilli paste that means business.", ""],
+["Gaeng Liang", "Thailand", 55, 0, 20, 20, 85, 72, 35, 75, 30, 7, "An ancient peppercorn-and-herb vegetable curry — chilli-free heat from black pepper alone.", ""],
+["Gaeng Phet Ped Yang", "Thailand", 60, 75, 50, 35, 65, 80, 55, 75, 35, 13, "Roast-duck red curry with pineapple and grapes — sweet, fruity, and unexpectedly elegant.", ""],
+["Khanom Jeen Nam Ya", "Thailand", 60, 55, 25, 35, 75, 78, 45, 40, 60, 13, "A fish-and-krachai curry ladled over fermented rice noodles — Thailand's breakfast of champions.", ""],
+
+// ---- SE Asia & Islands (expanded) ----
+["Sri Lankan Dhal Curry", "SE Asia & Islands", 40, 60, 15, 25, 75, 88, 55, 85, 30, 9, "Red lentils in coconut milk, tempered with curry leaves and mustard — Sri Lanka's three-meals-a-day backbone.", ""],
+["Sri Lankan Chicken Curry", "SE Asia & Islands", 70, 55, 15, 40, 60, 82, 55, 85, 50, 16, "Dark-roasted curry powder gives this its smoulder; coconut milk talks it back down.", ""],
+["Jaffna Crab Curry", "SE Asia & Islands", 85, 45, 10, 45, 65, 78, 45, 80, 50, 17, "Tamil Sri Lanka's crab curry, built on a roasted spice blend hot enough to need a finger-bowl and a nap.", ""],
+["Polos Curry", "SE Asia & Islands", 50, 55, 15, 35, 55, 80, 35, 80, 60, 14, "Young green jackfruit simmered into something so meaty carnivores file complaints.", ""],
+["Ambul Thiyal", "SE Asia & Islands", 55, 5, 10, 85, 10, 70, 40, 80, 45, 11, "Sour dry fish curry blackened with goraka — a pre-refrigeration trick that became a delicacy.", ""],
+["Opor Ayam", "SE Asia & Islands", 25, 80, 30, 20, 60, 85, 50, 85, 50, 15, "Indonesia's pale, gentle coconut chicken — the Lebaran feast's calm centre.", ""],
+["Gulai Kambing", "SE Asia & Islands", 55, 70, 25, 30, 70, 80, 45, 85, 90, 18, "Goat in a golden, spice-thick coconut gravy — Padang's answer to a cold heart.", ""],
+["Sayur Lodeh", "SE Asia & Islands", 30, 65, 25, 25, 80, 80, 40, 85, 40, 12, "A coconut vegetable curry that turns whatever's in the fridge into a Javanese comfort.", ""],
+["Asam Laksa", "SE Asia & Islands", 60, 0, 30, 85, 90, 72, 60, 40, 60, 12, "Penang's sour mackerel laksa — tamarind-sharp, coconut-free, and a personal rebuttal to the creamy kind.", ""],
+["Kari Debal", "SE Asia & Islands", 85, 20, 20, 65, 50, 72, 35, 80, 60, 16, "The Kristang 'Devil's Curry' — a Eurasian Boxing-Day blaze of vinegar, mustard, and leftover heat.", ""],
+["Curry Kapitan", "SE Asia & Islands", 50, 60, 30, 45, 55, 80, 45, 80, 60, 16, "Nyonya chicken curry with candlenut and a squeeze of lime — named for a sea captain who allegedly only ate this.", ""],
+["Singapore Fish Head Curry", "SE Asia & Islands", 65, 45, 20, 65, 75, 78, 55, 80, 50, 15, "South-Indian fire meets a Chinese love of fish heads — Singapore's great culinary handshake, eyeballs included.", ""],
+["Cà Ri Gà", "SE Asia & Islands", 35, 65, 40, 20, 70, 82, 50, 55, 50, 12, "Vietnamese chicken curry, lemongrass-scented and sweet-potato-soft, eaten with a baguette the French left behind.", ""],
+["Samlor Kari", "SE Asia & Islands", 35, 70, 45, 25, 70, 82, 45, 60, 50, 13, "Cambodia's mild red coconut curry, also served with bread — gentle, fragrant, and quietly confident.", ""],
+["Or Lam", "SE Asia & Islands", 55, 0, 15, 30, 75, 75, 30, 60, 60, 12, "Luang Prabang's herbal stew-curry, numbed and warmed by sakhan pepper-wood — Laos in a clay pot.", ""],
+["Bicol Express", "SE Asia & Islands", 85, 70, 20, 20, 45, 80, 50, 90, 40, 9, "Pork, coconut milk, and a reckless quantity of chillies — named after a train, paced like one too.", ""],
+
+// ---- East Asia (expanded) ----
+["Curry Udon", "East Asia", 25, 35, 55, 10, 80, 90, 65, 20, 30, 8, "Japanese curry loosened with dashi and poured over fat udon — the world's most slurpable curry.", ""],
+["Sapporo Soup Curry", "East Asia", 45, 20, 35, 25, 95, 85, 50, 70, 90, 16, "Hokkaido's thin, spiced curry-soup with a whole chicken leg and towers of vegetables standing proud.", ""],
+["Japanese Keema Curry", "East Asia", 30, 20, 50, 20, 25, 85, 55, 85, 40, 10, "Dry minced-meat curry over rice, often crowned with a soft egg — weeknight Japan at its kindest.", ""],
+["Curry Fish Balls", "East Asia", 45, 30, 45, 15, 60, 80, 55, 5, 30, 8, "Hong Kong's skewered street snack, bobbing in sweet curry sauce on every corner after school.", ""],
+["Macanese African Chicken", "East Asia", 45, 60, 30, 25, 35, 80, 40, 60, 70, 14, "Portugal sailed coconut, chilli, and peanut from Africa to Macau and baked them onto a chicken — a four-continent curry.", ""],
+["Taiwanese Curry Rice", "East Asia", 20, 35, 60, 10, 50, 88, 50, 90, 40, 8, "Japanese-style curry, sweetened and potato-heavy, that became a Taiwanese lunchbox institution.", ""],
+["HK Curry Beef Brisket", "East Asia", 40, 35, 40, 20, 65, 85, 55, 70, 120, 11, "Tendon-and-brisket in a sweet curry gravy — the cha-chaan-teng dish that demands extra rice.", ""],
+
+// ---- Persia, Arabia & Africa ----
+["Khoresh Gheimeh", "Persia, Arabia & Africa", 25, 10, 20, 55, 65, 82, 40, 90, 90, 11, "Persian split-pea and lamb stew, soured with dried lime and crowned with shoestring fries — yes, on top.", ""],
+["Ghormeh Sabzi", "Persia, Arabia & Africa", 20, 5, 10, 65, 65, 88, 50, 90, 180, 10, "Iran's beloved herb stew — fenugreek, kidney beans, and dried lime simmered until almost black. The national hug.", ""],
+["Fesenjan", "Persia, Arabia & Africa", 15, 30, 55, 70, 55, 82, 45, 90, 120, 9, "Duck or chicken in a pomegranate-walnut sauce so sweet-sour and dark it tastes medieval — because it is.", ""],
+["Saltah", "Persia, Arabia & Africa", 40, 15, 10, 30, 70, 80, 35, 50, 60, 12, "Yemen's bubbling stone-pot stew, capped with a green fenugreek froth called hilbeh — eaten the instant it stops boiling.", ""],
+["Fahsa", "Persia, Arabia & Africa", 45, 10, 10, 25, 65, 80, 30, 55, 90, 12, "Shredded lamb in a clay pot, whipped with hilbeh and served still erupting — Yemen does not believe in lukewarm.", ""],
+["Bamia", "Persia, Arabia & Africa", 35, 5, 15, 45, 70, 80, 45, 80, 75, 9, "Okra and lamb stewed in garlicky tomato — the Iraqi-Egyptian comfort that proves okra's worth to the skeptics.", ""],
+["Molokhia", "Persia, Arabia & Africa", 30, 5, 10, 30, 80, 82, 45, 80, 45, 7, "Jute leaves cooked into a green, garlicky, faintly slippery stew Egyptians would defend with their lives.", ""],
+["Doro Wat", "Persia, Arabia & Africa", 75, 10, 15, 35, 55, 85, 55, 5, 150, 18, "Ethiopia's berbere-red chicken stew with a whole boiled egg, scooped up with injera — the Sunday and the celebration.", ""],
+["Misir Wat", "Persia, Arabia & Africa", 70, 10, 15, 30, 60, 82, 45, 5, 60, 14, "Red lentils stewed in berbere and onions melted to nothing — Ethiopia's vegan firework, fasting-day approved.", ""],
+["Alicha", "Persia, Arabia & Africa", 15, 15, 25, 20, 60, 80, 35, 5, 60, 9, "The mild, turmeric-gold Ethiopian stew for days when berbere feels like too much commitment.", ""],
+["Somali Suqaar", "Persia, Arabia & Africa", 45, 10, 15, 25, 40, 80, 30, 70, 40, 13, "Diced meat sautéed with xawaash spice and peppers — the quick Somali curry that flexes the old spice routes.", ""],
+["Kuku Paka", "Persia, Arabia & Africa", 40, 70, 20, 35, 60, 82, 40, 75, 50, 12, "Swahili-coast chicken grilled, then simmered in coconut and lime — East Africa where India meets the Indian Ocean.", ""],
+["Zanzibar Fish Curry", "Persia, Arabia & Africa", 45, 70, 25, 50, 70, 80, 40, 80, 40, 14, "Spice-island fish in coconut and tamarind — cloves, cardamom, and a port's worth of history in one pot.", ""],
+["Nigerian Curry Chicken", "Persia, Arabia & Africa", 60, 10, 15, 25, 55, 78, 40, 80, 50, 11, "Curry powder, scotch bonnet, and a fistful of thyme — West Africa's brisk, peppery take on the curry pot.", ""],
+["Maafe", "Persia, Arabia & Africa", 35, 40, 30, 30, 70, 85, 45, 80, 90, 10, "Senegal's groundnut stew — peanut butter, tomato, and meat melted into West Africa's answer to massaman.", ""],
+["Afghan Qorma", "Persia, Arabia & Africa", 30, 15, 25, 30, 55, 85, 40, 85, 90, 12, "An onion-and-tomato lamb korma with no cream in sight — Afghanistan's foundation stone, ladled over palaw.", ""],
+
+// ---- Diaspora & Fusion (expanded) ----
+["Balti", "Diaspora & Fusion", 55, 35, 25, 35, 45, 80, 60, 50, 35, 14, "Birmingham's wok-cooked curry, served in the same bowl it's cooked in and mopped up with a naan the size of a pillow.", ""],
+["Jalfrezi", "Diaspora & Fusion", 70, 20, 25, 35, 35, 75, 65, 65, 30, 13, "Peppers, onions, and green chillies stir-fried hot — the curry-house answer to leftover roast.", ""],
+["Pathia", "Diaspora & Fusion", 65, 25, 55, 70, 50, 72, 45, 65, 35, 13, "The curry-house sweet-sour-hot trifecta — Parsi roots, British-Indian wardrobe.", ""],
+["Trini Curry Crab & Dumpling", "Diaspora & Fusion", 60, 50, 15, 30, 60, 80, 45, 30, 60, 12, "Tobago's beach lunch — curried blue crab with chewy flour dumplings and a stack of napkins.", ""],
+["Curry Duck", "Diaspora & Fusion", 70, 25, 15, 35, 50, 80, 40, 70, 90, 13, "Trini-Guyanese 'liming' food — duck curried over a fire while the rum goes around.", ""],
+["Fiji Lamb Curry", "Diaspora & Fusion", 55, 30, 20, 30, 60, 82, 35, 80, 75, 14, "Indo-Fijian curry built on hand-roasted masala — the indenture-era recipe that became a national comfort.", ""],
+["Mauritian Cari Poulet", "Diaspora & Fusion", 45, 20, 20, 35, 50, 80, 40, 75, 50, 13, "Island chicken curry scented with thyme and curry leaves, served with rougaille and a heap of rice.", ""],
+["Country Captain", "Diaspora & Fusion", 30, 25, 40, 35, 45, 80, 35, 80, 60, 11, "A Raj-era curry that sailed to Georgia and became Southern — chicken, currants, and a colonial backstory.", ""],
+["Coronation Chicken", "Diaspora & Fusion", 20, 70, 55, 40, 25, 75, 60, 30, 30, 8, "Cold curried-mayo chicken invented for Elizabeth II's 1953 coronation — the sandwich filling that conquered Britain.", ""],
+["Bobotie", "Diaspora & Fusion", 25, 35, 55, 40, 20, 80, 45, 65, 75, 12, "Cape Malay curried mince baked under an egg custard, studded with raisins and bay — South Africa's sweet-spiced comfort.", ""],
+["Railway Mutton Curry", "Diaspora & Fusion", 50, 30, 20, 40, 70, 80, 45, 75, 90, 14, "Mild, soupy, coconut-tamarind mutton invented to keep first-class Raj passengers from complaining — about the food and the carriage.", ""],
+["Dak Bungalow Curry", "Diaspora & Fusion", 55, 25, 20, 35, 60, 78, 35, 75, 75, 14, "The curry cooked by rest-house caretakers for travelling sahibs — whatever the bungalow had, plus a boiled egg on top.", ""],
+["Surinamese Roti Kip", "Diaspora & Fusion", 45, 25, 25, 25, 45, 82, 40, 20, 60, 13, "Chicken-and-potato masala wrapped in a flaky roti — the Dutch-Caribbean lunch that runs Amsterdam.", ""],
 ];
 
 // ---------------- state ----------------
