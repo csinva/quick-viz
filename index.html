@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Spectra — interactive maps of everything</title>
+<title>Data-driven deep-dives — interactive maps of everything</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -12,8 +12,8 @@
                 radial-gradient(900px 500px at 90% 110%, #3a1525 0%, transparent 60%), #0d0b14;
     color: #f2eefa;
     font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 48px 20px;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 56px 10px 40px;
   }
   .stars { position: fixed; inset: 0; pointer-events: none; }
   .stars span {
@@ -22,94 +22,149 @@
   }
   @keyframes tw { from { opacity: .12; } to { opacity: .7; } }
 
-  header { text-align: center; margin-bottom: 44px; }
+  header { text-align: center; margin-bottom: 40px; max-width: 680px; }
   h1 {
-    font-size: clamp(34px, 6vw, 58px); font-weight: 800; letter-spacing: -0.02em;
+    font-size: clamp(40px, 8vw, 72px); font-weight: 800; letter-spacing: -0.03em;
     background: linear-gradient(90deg, #f6c4e1, #c9b8ff 40%, #9fd8ff 75%, #ffe2a8);
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
-  .tag { color: #9b93ad; margin-top: 10px; font-size: 16px; }
+  .tag { color: #9b93ad; margin-top: 12px; font-size: 16px; line-height: 1.6; }
 
-  .cards { display: flex; gap: 26px; flex-wrap: wrap; justify-content: center; max-width: 1000px; }
-  .card {
+  .feed { width: 100%; max-width: 960px; display: flex; flex-direction: column; gap: 22px; }
+  .feed-label {
+    font-size: 12px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase;
+    color: #6f6788; margin: 4px 2px 2px; display: flex; align-items: center; gap: 10px;
+  }
+  .feed-label::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, #2e2845, transparent); }
+
+  .post {
     position: relative; display: block; text-decoration: none; color: inherit;
-    width: 420px; max-width: 92vw; border-radius: 22px; padding: 30px 30px 26px;
+    width: 100%; border-radius: 20px; padding: 24px 28px 24px;
     border: 1px solid #2e2845; overflow: hidden;
     transition: transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s, border-color .25s;
   }
-  .card:hover { transform: translateY(-6px) scale(1.015); border-color: #ffffff44; }
-  .card.taylor {
-    background: linear-gradient(150deg, #241b3a 0%, #14101f 55%, #1d1430 100%);
-    box-shadow: 0 22px 60px rgba(110, 70, 200, .25);
-  }
-  .card.taylor:hover { box-shadow: 0 30px 80px rgba(150, 100, 255, .4); }
-  .card.olivia {
-    background: linear-gradient(150deg, #321526 0%, #15101c 55%, #2a1230 100%);
-    box-shadow: 0 22px 60px rgba(210, 60, 110, .22);
-  }
-  .card.olivia:hover { box-shadow: 0 30px 80px rgba(230, 80, 130, .38); }
-  .card.bball {
-    background: linear-gradient(150deg, #2e1d12 0%, #161013 55%, #2a1a0e 100%);
-    box-shadow: 0 22px 60px rgba(232, 115, 26, .2);
-  }
-  .card.bball:hover { box-shadow: 0 30px 80px rgba(232, 115, 26, .36); }
-  .card.curry {
-    background: linear-gradient(150deg, #2e2410 0%, #171208 55%, #2c1c0a 100%);
-    box-shadow: 0 22px 60px rgba(212, 160, 40, .2);
-  }
-  .card.curry:hover { box-shadow: 0 30px 80px rgba(232, 180, 60, .36); }
-  .card.worldcup {
-    background: linear-gradient(150deg, #10301d 0%, #0d1714 55%, #0e2a1a 100%);
-    box-shadow: 0 22px 60px rgba(47, 175, 90, .2);
-  }
-  .card.worldcup:hover { box-shadow: 0 30px 80px rgba(60, 200, 110, .36); }
-  .card .glow {
-    position: absolute; top: -60px; right: -60px; width: 180px; height: 180px;
-    border-radius: 50%; filter: blur(50px); opacity: .5;
+  .post:hover { transform: translateY(-4px); border-color: #ffffff44; }
+  .post.taylor   { background: linear-gradient(150deg, #241b3a 0%, #14101f 55%, #1d1430 100%); box-shadow: 0 18px 50px rgba(110, 70, 200, .22); }
+  .post.taylor:hover   { box-shadow: 0 26px 70px rgba(150, 100, 255, .38); }
+  .post.olivia   { background: linear-gradient(150deg, #321526 0%, #15101c 55%, #2a1230 100%); box-shadow: 0 18px 50px rgba(210, 60, 110, .2); }
+  .post.olivia:hover   { box-shadow: 0 26px 70px rgba(230, 80, 130, .36); }
+  .post.bball    { background: linear-gradient(150deg, #2e1d12 0%, #161013 55%, #2a1a0e 100%); box-shadow: 0 18px 50px rgba(232, 115, 26, .18); }
+  .post.bball:hover    { box-shadow: 0 26px 70px rgba(232, 115, 26, .34); }
+  .post.curry    { background: linear-gradient(150deg, #2e2410 0%, #171208 55%, #2c1c0a 100%); box-shadow: 0 18px 50px rgba(212, 160, 40, .18); }
+  .post.curry:hover    { box-shadow: 0 26px 70px rgba(232, 180, 60, .34); }
+  .post.worldcup { background: linear-gradient(150deg, #10301d 0%, #0d1714 55%, #0e2a1a 100%); box-shadow: 0 18px 50px rgba(47, 175, 90, .18); }
+  .post.worldcup:hover { box-shadow: 0 26px 70px rgba(60, 200, 110, .34); }
+  .post .glow {
+    position: absolute; top: -70px; right: -60px; width: 190px; height: 190px;
+    border-radius: 50%; filter: blur(55px); opacity: .5;
   }
   .taylor .glow { background: #8b5cf6; }
   .olivia .glow { background: #e0356e; }
   .bball .glow { background: #e8731a; }
   .curry .glow { background: #d4a028; }
   .worldcup .glow { background: #2faf5a; }
-  .who { font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #9b93ad; }
-  .card h2 { font-size: 28px; font-weight: 800; margin: 8px 0 10px; }
+
+  .byline { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; font-size: 12.5px; color: #8d84a8; }
+  .byline .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+  .taylor .byline .dot { background: #8b5cf6; }
+  .olivia .byline .dot { background: #e0356e; }
+  .bball .byline .dot { background: #e8731a; }
+  .curry .byline .dot { background: #d4a028; }
+  .worldcup .byline .dot { background: #2faf5a; }
+  .byline time { font-weight: 700; color: #cabfe0; }
+  .byline .who { letter-spacing: .12em; text-transform: uppercase; font-weight: 700; font-size: 11.5px; }
+
+  .post h2 { font-size: clamp(22px, 4.2vw, 27px); font-weight: 800; margin: 9px 0 9px; }
   .taylor h2 { color: #d9c9ff; }
   .olivia h2 { color: #ff9fb8; }
   .bball h2 { color: #ffb066; }
   .curry h2 { color: #ffd166; }
   .worldcup h2 { color: #7fe0a0; }
-  .desc { color: #b7add0; font-size: 14px; line-height: 1.65; min-height: 70px; }
-  .eras { display: flex; gap: 5px; margin: 18px 0 14px; }
+  .desc { color: #b7add0; font-size: 14px; line-height: 1.65; }
+  .eras { display: flex; gap: 5px; margin: 16px 0 13px; }
   .eras i { height: 8px; border-radius: 8px; flex: 1; opacity: .85; }
   .meta { display: flex; gap: 14px; flex-wrap: wrap; color: #8d84a8; font-size: 12.5px; }
   .meta b { color: #e8def8; }
   .go {
-    margin-top: 20px; display: inline-block; font-weight: 800; font-size: 14px;
-    color: #fff; padding: 10px 20px; border-radius: 999px;
+    margin-top: 18px; display: inline-block; font-weight: 800; font-size: 13.5px;
+    color: #fff; padding: 9px 19px; border-radius: 999px;
   }
-  .taylor .go { background: linear-gradient(90deg, #6d4fc2, #a64fc2); box-shadow: 0 0 18px rgba(150,100,255,.4); }
-  .olivia .go { background: linear-gradient(90deg, #c2275a, #e0356e); box-shadow: 0 0 18px rgba(230,80,130,.4); }
-  .bball .go { background: linear-gradient(90deg, #c25a1a, #e8731a); box-shadow: 0 0 18px rgba(232,115,26,.4); }
-  .curry .go { background: linear-gradient(90deg, #b8860b, #d4a028); box-shadow: 0 0 18px rgba(212,160,40,.4); }
+  .taylor .go   { background: linear-gradient(90deg, #6d4fc2, #a64fc2); box-shadow: 0 0 18px rgba(150,100,255,.4); }
+  .olivia .go   { background: linear-gradient(90deg, #c2275a, #e0356e); box-shadow: 0 0 18px rgba(230,80,130,.4); }
+  .bball .go    { background: linear-gradient(90deg, #c25a1a, #e8731a); box-shadow: 0 0 18px rgba(232,115,26,.4); }
+  .curry .go    { background: linear-gradient(90deg, #b8860b, #d4a028); box-shadow: 0 0 18px rgba(212,160,40,.4); }
   .worldcup .go { background: linear-gradient(90deg, #1f8f4a, #2faf5a); box-shadow: 0 0 18px rgba(47,175,90,.4); }
 
-  footer { margin-top: 46px; color: #564e6e; font-size: 12.5px; text-align: center; line-height: 1.7; }
+  footer { margin-top: 46px; color: #564e6e; font-size: 12.5px; text-align: center; line-height: 1.7; max-width: 720px; }
+  footer a { color: #9b93ad; text-decoration: none; border-bottom: 1px solid #564e6e; }
 </style>
 </head>
 <body>
 <div class="stars" id="stars"></div>
 
 <header>
-  <h1>The Spectra</h1>
-  <div class="tag">Interactive maps of entire catalogs — pop discographies, hoops legends, the world's curries. Every dot scored, plotted, and clickable. Plus your aura.</div>
+  <h1>Data-driven deep-dives</h1>
+  <div class="tag">A blog of interactive data deep-dives — entire catalogs scored, plotted, and clickable. Pop discographies, hoops legends, the world's curries, a live World Cup. Every dot tells a story. Plus your aura.</div>
 </header>
 
-<div class="cards">
-  <a class="card taylor" href="taylor.html">
+<main class="feed">
+  <div class="feed-label">Latest posts</div>
+
+  <a class="post worldcup" href="worldcup2026.html">
     <div class="glow"></div>
-    <div class="who">Taylor Swift</div>
-    <h2>The Swiftie Spectrum</h2>
+    <div class="byline"><span class="dot"></span><time>Jun 16, 2026</time> · <span class="who">World Cup · 1958–2026</span></div>
+    <h2>The World Cup Deep-Dive</h2>
+    <div class="desc">122 players — Pelé, Maradona and the all-time greats beside the stars, wonderkids and viral breakouts of the 2026 tournament — plotted by goals, caps, titles, Insta boom (followers before kickoff vs today), and aura. Pick your front five and get scouted.</div>
+    <div class="eras">
+      <i style="background:#d6453c"></i><i style="background:#3fb8af"></i>
+      <i style="background:#5dade2"></i><i style="background:#e8b647"></i>
+    </div>
+    <div class="meta"><span><b>122</b> players</span><span><b>4</b> positions</span><span><b>13</b> stats</span><span><b>⚽</b> scouting reports</span></div>
+    <span class="go">Kick off →</span>
+  </a>
+
+  <a class="post curry" href="curry.html">
+    <div class="glow"></div>
+    <div class="byline"><span class="dot"></span><time>Jun 16, 2026</time> · <span class="who">The world's curries</span></div>
+    <h2>The Curry Deep-Dive</h2>
+    <div class="desc">151 curries from korma to phaal, Bengal to Addis Ababa, Chiang Mai to Glasgow — mapped by heat, creaminess, tang, soupiness, and cook time. Rendang anchors dry; rasam anchors soup; currywurst attends under protest.</div>
+    <div class="eras">
+      <i style="background:#e8b647"></i><i style="background:#6fae4e"></i><i style="background:#d4658f"></i><i style="background:#3fb8af"></i>
+      <i style="background:#c97a3d"></i><i style="background:#7b8cde"></i><i style="background:#a78bd0"></i><i style="background:#d6453c"></i>
+    </div>
+    <div class="meta"><span><b>151</b> curries</span><span><b>8</b> traditions</span><span><b>10</b> dimensions</span><span><b>🍛</b> order readings</span></div>
+    <span class="go">Order the spread →</span>
+  </a>
+
+  <a class="post bball" href="basketball.html">
+    <div class="glow"></div>
+    <div class="byline"><span class="dot"></span><time>Jun 13, 2026</time> · <span class="who">NBA · 1956–2026</span></div>
+    <h2>The Basketball Deep-Dive</h2>
+    <div class="desc">100 legends and current stars — Muggsy to Manute, Russell to Wemby — plotted by height, free throws, rings, clutch, and aura. Build your starting five and get scouted.</div>
+    <div class="eras">
+      <i style="background:#5dade2"></i><i style="background:#e8b647"></i><i style="background:#6fae4e"></i>
+      <i style="background:#d6453c"></i><i style="background:#a05cc8"></i>
+    </div>
+    <div class="meta"><span><b>100</b> players</span><span><b>5</b> positions</span><span><b>14</b> stats</span><span><b>📋</b> scouting reports</span></div>
+    <span class="go">Take the court →</span>
+  </a>
+
+  <a class="post olivia" href="olivia.html">
+    <div class="glow"></div>
+    <div class="byline"><span class="dot"></span><time>Jun 12, 2026</time> · <span class="who">Olivia Rodrigo</span></div>
+    <h2>The Rodrigo Deep-Dive</h2>
+    <div class="desc">All 43 songs — SOUR, GUTS (spilled), the brand-new <i>you seem pretty sad for a girl so in love</i>, and the soundtrack era — mapped from serene to scorched-earth.</div>
+    <div class="eras">
+      <i style="background:#b18cff"></i><i style="background:#d63b5e"></i><i style="background:#e8927c"></i><i style="background:#3fb8af"></i>
+    </div>
+    <div class="meta"><span><b>43</b> songs</span><span><b>4</b> eras</span><span><b>9</b> metrics</span><span><b>🔮</b> aura readings</span></div>
+    <span class="go">Spill your guts →</span>
+  </a>
+
+  <a class="post taylor" href="taylor.html">
+    <div class="glow"></div>
+    <div class="byline"><span class="dot"></span><time>Jun 11, 2026</time> · <span class="who">Taylor Swift</span></div>
+    <h2>The Swiftie Deep-Dive</h2>
     <div class="desc">All 252 songs — every album track, vault track, and loose single from the 2006 debut to last week — across happiness, heartbreak, vengeance, country-ness, and more.</div>
     <div class="eras">
       <i style="background:#6fae4e"></i><i style="background:#e8b647"></i><i style="background:#a05cc8"></i>
@@ -120,63 +175,12 @@
     <div class="meta"><span><b>252</b> songs</span><span><b>13</b> eras</span><span><b>10</b> metrics</span><span><b>🔮</b> aura readings</span></div>
     <span class="go">Enter the multiverse →</span>
   </a>
-
-  <a class="card olivia" href="olivia.html">
-    <div class="glow"></div>
-    <div class="who">Olivia Rodrigo</div>
-    <h2>The Rodrigo Spectrum</h2>
-    <div class="desc">All 43 songs — SOUR, GUTS (spilled), the brand-new <i>you seem pretty sad for a girl so in love</i>, and the soundtrack era — mapped from serene to scorched-earth.</div>
-    <div class="eras">
-      <i style="background:#b18cff"></i><i style="background:#d63b5e"></i><i style="background:#e8927c"></i><i style="background:#3fb8af"></i>
-    </div>
-    <div class="meta"><span><b>43</b> songs</span><span><b>4</b> eras</span><span><b>9</b> metrics</span><span><b>🔮</b> aura readings</span></div>
-    <span class="go">Spill your guts →</span>
-  </a>
-
-  <a class="card bball" href="basketball.html">
-    <div class="glow"></div>
-    <div class="who">NBA · 1956–2026</div>
-    <h2>The Basketball Spectrum</h2>
-    <div class="desc">60 legends and current stars — Muggsy to Manute, Russell to Wemby — plotted by height, free throws, rings, clutch, and aura. Build your starting five and get scouted.</div>
-    <div class="eras">
-      <i style="background:#5dade2"></i><i style="background:#e8b647"></i><i style="background:#6fae4e"></i>
-      <i style="background:#d6453c"></i><i style="background:#a05cc8"></i>
-    </div>
-    <div class="meta"><span><b>100</b> players</span><span><b>5</b> positions</span><span><b>11</b> stats</span><span><b>📋</b> scouting reports</span></div>
-    <span class="go">Take the court →</span>
-  </a>
-
-  <a class="card curry" href="curry.html">
-    <div class="glow"></div>
-    <div class="who">The world's curries</div>
-    <h2>The Curry Spectrum</h2>
-    <div class="desc">151 curries from korma to phaal, Bengal to Addis Ababa, Chiang Mai to Glasgow — mapped by heat, creaminess, tang, soupiness, and cook time. Rendang anchors dry; rasam anchors soup; currywurst attends under protest.</div>
-    <div class="eras">
-      <i style="background:#e8b647"></i><i style="background:#6fae4e"></i><i style="background:#d4658f"></i><i style="background:#3fb8af"></i>
-      <i style="background:#c97a3d"></i><i style="background:#7b8cde"></i><i style="background:#a78bd0"></i><i style="background:#d6453c"></i>
-    </div>
-    <div class="meta"><span><b>151</b> curries</span><span><b>8</b> traditions</span><span><b>10</b> dimensions</span><span><b>🍛</b> order readings</span></div>
-    <span class="go">Order the spread →</span>
-  </a>
-
-  <a class="card worldcup" href="worldcup2026.html">
-    <div class="glow"></div>
-    <div class="who">World Cup · 1958–2026</div>
-    <h2>The World Cup Spectrum</h2>
-    <div class="desc">67 players — Pelé, Maradona and the all-time greats beside the stars and wonderkids of the 2026 tournament — plotted by goals, caps, titles, debut age, and aura. Pick your front five and get scouted.</div>
-    <div class="eras">
-      <i style="background:#d6453c"></i><i style="background:#3fb8af"></i>
-      <i style="background:#5dade2"></i><i style="background:#e8b647"></i>
-    </div>
-    <div class="meta"><span><b>67</b> players</span><span><b>4</b> positions</span><span><b>12</b> stats</span><span><b>⚽</b> scouting reports</span></div>
-    <span class="go">Kick off →</span>
-  </a>
-</div>
+</main>
 
 <footer>
   Hand-annotated by Claude · streams &amp; lengths via the iTunes catalog and kworb.net · hover any dot inside to play the song.<br>
   Your aura is computed locally from your picks. The stars are decorative. Probably.<br>
-  Made with love by <a href="https://x.com/csinva" target="_blank" rel="noopener" style="color:#9b93ad; text-decoration:none; border-bottom:1px solid #564e6e;">@csinva</a>
+  Made with love by <a href="https://x.com/csinva" target="_blank" rel="noopener">@csinva</a>
 </footer>
 
 <script>

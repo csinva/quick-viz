@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The World Cup Spectrum — every legend, every wonderkid</title>
+<title>The World Cup Deep-Dive — every legend, every wonderkid</title>
 <style>
   :root {
     --bg: #0d0b14;
@@ -182,6 +182,7 @@
   #tip .t-cover { width: 46px; height: 46px; border-radius: 8px; flex: none; object-fit: cover; border: 1px solid #ffffff30; }
   #tip .t-title { font-weight: 800; font-size: 14.5px; }
   #tip .t-album { font-size: 12px; margin-top: 1px; }
+  #tip .t-club { font-size: 12px; margin-top: 2px; color: #cfc6e6; }
   #tip .t-score { font-weight: 700; color: #ffd9ec; }
   #tip .t-note { color: #b7add0; font-style: italic; margin-top: 7px; }
   #tip .t-metric { margin-top: 7px; }
@@ -401,16 +402,16 @@
 </style>
 </head>
 <body>
-<a class="home-btn" href="index.html" title="Back to The Spectra">⌂ Home</a>
+<a class="home-btn" href="index.html" title="Back to deep-dive">⌂ Home</a>
 <div class="made-by">Made with love by <a href="https://x.com/csinva" target="_blank" rel="noopener">@csinva</a></div>
 <div class="wrap">
   <header>
-    <h1>The World Cup Spectrum</h1>
-    <div class="sub"><b>67 players</b> — World Cup legends beside the stars and wonderkids of 2026, which kicked off this week. Pick one stat per axis, filter by position, and hover any dot for the scouting card.</div>
+    <h1>The World Cup Deep-Dive</h1>
+    <div class="sub"><b>122 players</b> — World Cup legends beside the stars, wonderkids and viral breakouts of the 2026 tournament now underway. Pick one stat per axis, filter by position, and hover any dot for the scouting card.</div>
   </header>
 
   <nav class="tabs">
-    <button class="tab active" data-page="spectrum">🌌 The Spectrum</button>
+    <button class="tab active" data-page="spectrum">🌌 The Deep-Dive</button>
     <button class="tab" data-page="aura">⚽ Your Front Five</button>
   </nav>
 
@@ -450,7 +451,7 @@
 
   <footer>
     Stats are career World Cup and international numbers, approximate through the eve of the 2026 tournament (kicked off June 11, 2026).<br>
-    67 players: the all-time greats next to 49 members of the 2026 cast — the wonderkids (Yamal, Estêvão, Mastantuono, Doué, Cubarsí…) start at zero WC goals, bottom-right, where legends begin.<br>
+    122 players: the all-time greats next to 104 of the 2026 cast — the wonderkids (Yamal, Estêvão, Mastantuono, Doué, Cubarsí…) start at zero WC goals, bottom-right, where legends begin. Instagram counts are snapshots before kickoff vs today; Cape Verde keeper Vozinha leads the boom, 31K → 6.8M in a week.<br>
     Playoff nations (Italy, Turkey, Poland, Sweden…) are regrettably unrepresented pending squads. Hover a dot for the scouting card — highlights via YouTube, numbers via FBref.
   </footer>
 </div>
@@ -494,6 +495,16 @@ const ALBUMS = {
 
 // ---------------- metrics ----------------
 const METRICS = [
+  { k:"boom",   label:"Insta Boom",      lo:"😴 no bump", hi:"🚀 Vozinha's +21,000%",
+    blurb:"Follower growth since the World Cup kicked off — before vs today. Log-scaled; viral unknowns rocket, megastars barely move." },
+  { k:"insta",  label:"Insta Followers", lo:"📵 barely posts", hi:"📸 Ronaldo's 665M",
+    blurb:"Instagram following today, in millions. Log-scaled axis — 0 to 665M is a long way." },
+  { k:"price",  label:"Price Tag",    lo:"🆓 priceless / retired", hi:"💰 €200M wonderkid",
+    blurb:"Estimated transfer market value, € millions — legends sit at zero, the kids carry the price. Log-scaled axis." },
+  { k:"height", label:"Height",       lo:"🐜 Maradona's 165cm", hi:"🦒 Courtois's 200cm",
+    blurb:"Height in centimetres." },
+  { k:"agef",   label:"Debut Age",    lo:"🐣 thrown in as a teen", hi:"🍷 fashionably late",
+    blurb:"Age at their first World Cup — Pelé was 17." },
   { k:"wcg",    label:"WC Goals",     lo:"🥅 none yet", hi:"👑 Klose's 16",
     blurb:"Career World Cup goals." },
   { k:"wcm",    label:"WC Matches",   lo:"🧳 hasn't unpacked", hi:"🗺️ Messi's 26",
@@ -508,93 +519,209 @@ const METRICS = [
     blurb:"Career international appearances." },
   { k:"rel",    label:"First WC",     lo:"📻 radio era", hi:"🆕 debuts in 2026",
     blurb:"Year of their first World Cup — 1958 to this week." },
-  { k:"agef",   label:"Debut Age",    lo:"🐣 thrown in as a teen", hi:"🍷 fashionably late",
-    blurb:"Age at their first World Cup — Pelé was 17." },
-  { k:"price",  label:"Price Tag",    lo:"🆓 priceless / retired", hi:"💰 €200M wonderkid",
-    blurb:"Estimated transfer market value, € millions — legends sit at zero, the kids carry the price." },
-  { k:"insta",  label:"Insta Followers", lo:"📵 barely posts", hi:"📸 Ronaldo's 665M",
-    blurb:"Instagram following, in millions." },
   { k:"ballon", label:"Ballon d'Ors", lo:"🫥 none (yet)", hi:"🏆 Messi's 8",
     blurb:"Career Ballon d'Or wins." },
-  { k:"height", label:"Height",       lo:"🐜 Maradona's 165cm", hi:"🦒 Courtois's 200cm",
-    blurb:"Height in centimetres." },
 ];
+// per-metric: raw value accessor, axis-tick number formatter, and scale type.
+// followers / transfer value / boom span many orders of magnitude → log scale.
+const M_CFG = {
+  wcg:    { raw: s => s.wcgV,    fmt: v => Math.round(v) },
+  wcm:    { raw: s => s.wcmV,    fmt: v => Math.round(v) },
+  gpm:    { raw: s => s.gpmV,    fmt: v => v.toFixed(2) },
+  titles: { raw: s => s.titlesV, fmt: v => Math.round(v) },
+  intl:   { raw: s => s.intlV,   fmt: v => Math.round(v) },
+  caps:   { raw: s => s.capsV,   fmt: v => Math.round(v) },
+  rel:    { raw: s => s.firstWC, fmt: v => String(Math.round(v)) },
+  agef:   { raw: s => s.agefV,   fmt: v => Math.round(v) },
+  price:  { raw: s => s.priceV,  fmt: v => v < 0.05 ? "€0" : "€" + fmtNum(v) + "M", log: true },
+  insta:  { raw: s => s.instaV,  fmt: v => v < 0.05 ? "0" : fmtNum(v) + "M", log: true },
+  boom:   { raw: s => s.boomV,   fmt: v => v < 1 ? "0" : "+" + Math.round(v).toLocaleString() + "%", log: true },
+  ballon: { raw: s => s.ballonV, fmt: v => Math.round(v) },
+  height: { raw: s => s.htV,     fmt: v => Math.round(v) },
+};
+METRICS.forEach(m => Object.assign(m, M_CFG[m.k]));
 
 // ---------------- data ----------------
-// [name, position, wcGoals, wcMatches, wcTitles, intlGoals, caps, firstWC, debutAge, in2026, priceTagM, instaFollowersM, ballonDOrs, heightCm, note, youtubeId]
+// [name, position, wcGoals, wcMatches, wcTitles, intlGoals, caps, firstWC, debutAge, in2026, priceTagM, instaNowM, instaBeforeWcM, ballonDOrs, heightCm, note, youtubeId]
 const SONGS = [
-["Pelé", "Forward", 12, 14, 3, 77, 92, 1958, 17, 0, 0, 18, 0, 173, "Three World Cups. Seventeen years old in Sweden, immortal by the final.", "WXg8P0u9W9I"],
-["Ronaldo Nazário", "Forward", 15, 19, 2, 62, 98, 1998, 21, 0, 0, 30, 2, 183, "El Fenômeno: the 2002 redemption arc, eight goals, that haircut.", "bBRp7WTP0EY"],
-["Miroslav Klose", "Forward", 16, 24, 1, 71, 137, 2002, 24, 0, 0, 1.5, 0, 184, "All-time World Cup scorer: sixteen goals, all poached, zero apologies.", "7fH3zYZn8RI"],
-["Gerd Müller", "Forward", 14, 13, 1, 68, 62, 1970, 24, 0, 0, 0, 1, 176, "Der Bomber: fourteen goals in thirteen World Cup games.", "hCOC1TS9A1I"],
-["Just Fontaine", "Forward", 13, 6, 0, 30, 21, 1958, 24, 0, 0, 0, 0, 174, "Thirteen goals in ONE World Cup (1958). The unbreakable record.", "owlhGSbkbOs"],
-["Thomas Müller", "Forward", 10, 19, 1, 45, 131, 2010, 20, 0, 4, 16, 0, 185, "Ten WC goals by 24 — the Raumdeuter interpreted space itself.", "F1z7Uvjnlns"],
-["Lionel Messi", "Forward", 13, 26, 1, 112, 191, 2006, 18, 1, 15, 506, 8, 170, "The 2022 career-completion ceremony. Back at 38 for one more dance, practically in his Miami backyard.", "YGJPYh713d0"],
-["Cristiano Ronaldo", "Forward", 8, 22, 0, 138, 217, 2006, 21, 1, 12, 665, 5, 187, "His SIXTH World Cup. Still scoring at 41. The machine does not acknowledge time.", "mmeLCAP74KA"],
-["Kylian Mbappé", "Forward", 12, 14, 1, 50, 92, 2018, 19, 1, 180, 130, 0, 178, "Scored a final hat-trick and LOST. Twelve WC goals at 27 — Klose's record is officially nervous.", "6VC5VHn5EQM"],
-["Neymar", "Forward", 8, 13, 0, 79, 128, 2014, 22, 1, 8, 234, 0, 175, "Brazil's all-time scorer, chasing the one trophy that keeps escaping.", "K2csY1cMpfA"],
-["Harry Kane", "Forward", 8, 11, 0, 73, 108, 2018, 24, 1, 60, 18, 0, 188, "2018 Golden Boot; England's record scorer still owes them a star.", "FX3f5tOy350"],
-["Luis Suárez", "Forward", 7, 16, 0, 69, 143, 2010, 23, 1, 2, 38, 0, 182, "Goals, bites, and a goal-line handball he would absolutely do again.", "7r0RZikEAKo"],
-["Erling Haaland", "Forward", 0, 0, 0, 40, 45, 2026, 25, 1, 200, 41, 0, 195, "Norway's first World Cup since 1998 — the goal robot finally gets the stage.", "EppU7FwAyEc"],
-["Son Heung-min", "Forward", 3, 9, 0, 51, 134, 2014, 21, 1, 15, 15, 0, 183, "Asia's superstar on one last World Cup run with the armband.", "b2I2goUwrao"],
-["Vinícius Júnior", "Forward", 1, 5, 0, 30, 46, 2022, 22, 1, 140, 60, 0, 176, "The winger Brazil builds 2026 around.", "FrmxHd0llCg"],
-["Julián Álvarez", "Forward", 4, 7, 1, 15, 50, 2022, 22, 1, 100, 19, 0, 170, "Won a World Cup at 22 as the spider who never stops running.", "cD70puReIYk"],
-["Lautaro Martínez", "Forward", 0, 7, 1, 33, 75, 2022, 25, 1, 85, 12, 0, 174, "Won 2022 without scoring; has been making up for it ever since.", "caXG53bi7Wg"],
-["Bukayo Saka", "Forward", 3, 6, 0, 13, 50, 2022, 21, 1, 110, 9, 0, 178, "From the Euro penalty to England's most dependable spark.", "RUqxAK6lDqs"],
-["Cole Palmer", "Forward", 0, 0, 0, 7, 18, 2026, 24, 1, 100, 12, 0, 185, "Cold Palmer's first World Cup. Ice, meet summer.", "3CFm0dj96sI"],
-["Lamine Yamal", "Forward", 0, 0, 0, 22, 28, 2026, 18, 1, 200, 43, 0, 180, "The face of 2026: eighteen years old and already maybe the best winger alive.", "lACgOT_5zNU"],
-["Nico Williams", "Forward", 0, 2, 0, 9, 35, 2022, 20, 1, 40, 7, 0, 181, "Spain's other wing — the fast half of the most fun double act in the sport.", "qayCf_u6n7o"],
-["Désiré Doué", "Forward", 0, 0, 0, 4, 15, 2026, 21, 1, 120, 5, 0, 181, "The Champions League final star arrives at his first World Cup.", "VnxHqt75EUM"],
-["Estêvão", "Forward", 0, 0, 0, 6, 16, 2026, 19, 1, 80, 6, 0, 176, "They call him Messinho. Chelsea paid accordingly. First World Cup at 19.", "vzwZYkh9wuw"],
-["Rafael Leão", "Forward", 2, 5, 0, 6, 40, 2022, 23, 1, 50, 9, 0, 188, "Two sub goals in Qatar; auditioning for the lead role this time.", "YSFGkJCinU0"],
-["Jérémy Doku", "Forward", 0, 3, 0, 6, 35, 2022, 20, 1, 75, 3.5, 0, 173, "Belgium's new wave, dribbling out of the golden generation's shadow.", "6NKYM42Ektc"],
-["Jonathan David", "Forward", 0, 3, 0, 32, 70, 2022, 22, 1, 30, 1, 0, 180, "Canada's quiet scoring machine, hosting the world this time.", "Wu62qkHS15I"],
-["Santiago Giménez", "Forward", 0, 0, 0, 14, 40, 2026, 25, 1, 18, 3, 0, 183, "El Bebote — Mexico's hope for a home-soil statement.", "9x-xjGPCiI8"],
-["Diego Maradona", "Midfielder", 8, 21, 1, 34, 91, 1982, 21, 0, 0, 8, 0, 165, "The Hand of God and the Goal of the Century, four minutes apart.", "kVBFXwIKhug"],
-["Zinedine Zidane", "Midfielder", 5, 12, 1, 31, 108, 1998, 25, 0, 0, 44, 1, 185, "Two headers in one final, one headbutt in another. Range.", "GkWNboVtzho"],
-["Ronaldinho", "Midfielder", 3, 10, 1, 33, 97, 2002, 22, 0, 0, 78, 1, 181, "The free kick over Seaman, and the smile that won everyone.", "ADi1A1dX9wA"],
-["Andrés Iniesta", "Midfielder", 2, 13, 1, 13, 131, 2006, 22, 0, 0, 43, 0, 171, "The 116th-minute goal that ended eighty years of waiting.", "muwJQ6VT2w4"],
-["Xavi", "Midfielder", 0, 16, 1, 13, 133, 2002, 22, 0, 0, 9, 0, 170, "Tiki-taka's metronome; the 2010 midfield ran on Xavi time.", "lgGUd4CCX9o"],
-["Toni Kroos", "Midfielder", 3, 16, 1, 17, 114, 2010, 20, 0, 0, 48, 0, 183, "The 7-1 had his fingerprints on it. Retired undefeated against chaos.", "Fr-PZ1utSBY"],
-["Luka Modrić", "Midfielder", 3, 19, 0, 27, 188, 2006, 20, 1, 4, 39, 1, 172, "2018 Golden Ball; still conducting at 40 like time is a rumor.", "atReonbrBbk"],
-["Kevin De Bruyne", "Midfielder", 2, 14, 0, 30, 110, 2014, 22, 1, 8, 26, 0, 181, "The golden generation's last ride, now with wiser legs.", "_fXA3gPTlEQ"],
-["Christian Pulisic", "Midfielder", 1, 4, 0, 35, 82, 2022, 24, 1, 40, 5, 0, 177, "Captain America hosts the party this time.", "Afbp9d7qty8"],
-["Weston McKennie", "Midfielder", 0, 4, 0, 12, 62, 2022, 24, 1, 30, 2, 0, 185, "The USMNT's chaos midfielder, at home in every sense.", "9LvlzMAhkZI"],
-["Rodri", "Midfielder", 0, 5, 0, 9, 62, 2022, 26, 1, 50, 7, 1, 191, "Ballon d'Or holder; Spain's tempo lives in his boots.", "aRqbw98YphE"],
-["Jude Bellingham", "Midfielder", 1, 5, 0, 10, 48, 2022, 19, 1, 130, 41, 0, 186, "Hey Jude at 19 in Qatar. 2026 is the coronation attempt.", "BgbtHAnTozE"],
-["Jamal Musiala", "Midfielder", 0, 4, 0, 10, 42, 2022, 19, 1, 100, 6.5, 0, 184, "Bambi on espresso — Germany's joy merchant.", "gNRJrH1AQ6g"],
-["Florian Wirtz", "Midfielder", 0, 0, 0, 8, 35, 2026, 23, 1, 100, 4, 0, 177, "Germany's conductor-in-waiting, finally on the big podium.", "CSMj6VIPGE8"],
-["Enzo Fernández", "Midfielder", 1, 7, 1, 7, 48, 2022, 21, 1, 90, 12, 0, 178, "Best young player of 2022; runs the show like it owes him money.", "sDQBa591DK8"],
-["Alexis Mac Allister", "Midfielder", 1, 7, 1, 10, 52, 2022, 23, 1, 70, 7, 0, 174, "The most trustworthy man in Argentina's engine room.", "kP4RWQHD418"],
-["Federico Valverde", "Midfielder", 0, 4, 0, 10, 72, 2022, 24, 1, 90, 22, 0, 182, "The Falcon: two lungs, one howitzer of a right foot.", "Ok0wtAhKIU0"],
-["Phil Foden", "Midfielder", 0, 4, 0, 5, 48, 2022, 22, 1, 70, 14, 0, 171, "The Stockport Iniesta still waiting for his tournament.", "8gFTy6OYCG4"],
-["Pedri", "Midfielder", 0, 4, 0, 4, 35, 2022, 19, 1, 150, 22, 0, 174, "Plays like the ball owes him a favor and always pays up.", "cgYfkDXiLBU"],
-["Gavi", "Midfielder", 1, 5, 0, 6, 35, 2022, 18, 1, 30, 12, 0, 173, "Scored in a World Cup at 18 — Spain's snarling heartbeat.", "E5uV8Ax12EU"],
-["Warren Zaïre-Emery", "Midfielder", 0, 0, 0, 2, 12, 2026, 20, 1, 80, 2.5, 0, 178, "PSG's homegrown engine, World Cup debut at 20.", "LVZajTuWZHE"],
-["Aurélien Tchouaméni", "Midfielder", 1, 6, 0, 5, 45, 2022, 22, 1, 70, 4.5, 0, 187, "Scored against England in a quarterfinal and barely celebrated. Business.", "2tnWjmh-VwA"],
-["Bruno Fernandes", "Midfielder", 2, 10, 0, 26, 82, 2018, 23, 1, 35, 15, 0, 179, "Portugal's penalty-box telepath.", "DTxLMavV42w"],
-["Takefusa Kubo", "Midfielder", 0, 2, 0, 6, 48, 2022, 21, 1, 20, 4, 0, 173, "Japan's jewel — Real Madrid raised him, the Samurai Blue deploy him.", "tKtZSXAWmdE"],
-["Franco Mastantuono", "Midfielder", 0, 0, 0, 2, 10, 2026, 18, 1, 45, 3, 0, 178, "Real Madrid paid for the future; Argentina cashes the check now.", "gTBXNdMvfG0"],
-["Martin Ødegaard", "Midfielder", 0, 0, 0, 11, 68, 2026, 27, 1, 65, 9, 0, 178, "Twelve years famous, zero World Cups — until now.", "zZjdyKqXTwE"],
-["Cafu", "Defender", 0, 16, 2, 5, 142, 1994, 23, 0, 0, 2, 0, 176, "Played in three consecutive World Cup finals. The only one ever.", "jql4LqAdFWA"],
-["Paolo Maldini", "Defender", 0, 23, 0, 7, 126, 1990, 21, 0, 0, 6, 0, 186, "Twenty-three World Cup matches of pure elegance, zero titles. Cruel sport.", "_vJb-ag2a6s"],
-["Franz Beckenbauer", "Defender", 5, 18, 1, 14, 103, 1966, 20, 0, 0, 0, 2, 181, "Won it as captain, won it as coach, invented a position in between.", "SvczggHIzMU"],
-["Théo Hernandez", "Defender", 1, 6, 0, 2, 42, 2022, 25, 1, 20, 8, 0, 184, "Scored in a World Cup semifinal from left back. Normal stuff.", "RyMQi4ox9a4"],
-["William Saliba", "Defender", 0, 2, 0, 0, 30, 2022, 21, 1, 100, 5, 0, 192, "France's calmest human; attackers bounce off the serenity.", "m82wkBfqOXI"],
-["Achraf Hakimi", "Defender", 0, 10, 0, 11, 92, 2018, 19, 1, 80, 24, 0, 181, "The 2022 semifinal run's right flank; the panenka against Spain lives forever.", "MEfr6x6OPd4"],
-["Alphonso Davies", "Defender", 1, 3, 0, 16, 60, 2022, 22, 1, 40, 6.5, 0, 183, "Scored Canada's first-ever World Cup goal. Now he's hosting.", "eL6-vT2ikOo"],
-["Pau Cubarsí", "Defender", 0, 0, 0, 1, 16, 2026, 19, 1, 80, 4, 0, 184, "Reads the game like a thirty-year-old. Is nineteen.", "iVQIVNaIdW4"],
-["Lev Yashin", "Goalkeeper", 0, 12, 0, 0, 74, 1958, 28, 0, 0, 0, 1, 189, "The Black Spider — still the only goalkeeper to win the Ballon d'Or.", "YCR3mAbXao8"],
-["Gianluigi Buffon", "Goalkeeper", 0, 17, 1, 0, 176, 1998, 20, 0, 0, 11, 0, 192, "2006: five clean sheets and a wall where the goal used to be.", "7Y03hAXQ-Oc"],
-["Manuel Neuer", "Goalkeeper", 0, 18, 1, 0, 124, 2010, 24, 0, 2, 14, 0, 193, "The sweeper-keeper blueprint; redefined where a goalkeeper ends.", "pbsNA_6b8tM"],
-["Emiliano Martínez", "Goalkeeper", 0, 7, 1, 0, 52, 2022, 30, 1, 12, 14, 0, 195, "The dark arts in gloves; 2022's decisive paw.", "eV52-Sotw90"],
-["Alisson", "Goalkeeper", 0, 9, 0, 0, 70, 2018, 25, 1, 15, 9, 0, 193, "Brazil's calm in goal — order behind the jogo bonito.", "_rB71BAE0p4"],
-["Thibaut Courtois", "Goalkeeper", 0, 14, 0, 0, 102, 2014, 22, 1, 15, 17, 0, 200, "Best keeper of 2018; two meters of bad news for strikers.", "g3hqudgOguU"],
+["Pelé", "Forward", 12, 14, 3, 77, 92, 1958, 17, 0, 0, 18, 18, 0, 173, "Three World Cups. Seventeen years old in Sweden, immortal by the final.", "WXg8P0u9W9I"],
+["Ronaldo Nazário", "Forward", 15, 19, 2, 62, 98, 1998, 21, 0, 0, 30, 30, 2, 183, "El Fenômeno: the 2002 redemption arc, eight goals, that haircut.", "bBRp7WTP0EY"],
+["Miroslav Klose", "Forward", 16, 24, 1, 71, 137, 2002, 24, 0, 0, 1.5, 1.5, 0, 184, "All-time World Cup scorer: sixteen goals, all poached, zero apologies.", "7fH3zYZn8RI"],
+["Gerd Müller", "Forward", 14, 13, 1, 68, 62, 1970, 24, 0, 0, 0, 0, 1, 176, "Der Bomber: fourteen goals in thirteen World Cup games.", "hCOC1TS9A1I"],
+["Just Fontaine", "Forward", 13, 6, 0, 30, 21, 1958, 24, 0, 0, 0, 0, 0, 174, "Thirteen goals in ONE World Cup (1958). The unbreakable record.", "owlhGSbkbOs"],
+["Thomas Müller", "Forward", 10, 19, 1, 45, 131, 2010, 20, 0, 4, 16, 16, 0, 185, "Ten WC goals by 24 — the Raumdeuter interpreted space itself.", "F1z7Uvjnlns"],
+["Lionel Messi", "Forward", 13, 26, 1, 112, 191, 2006, 18, 1, 15, 506, 504, 8, 170, "The 2022 career-completion ceremony. Back at 38 for one more dance, practically in his Miami backyard.", "YGJPYh713d0"],
+["Cristiano Ronaldo", "Forward", 8, 22, 0, 138, 217, 2006, 21, 1, 12, 665, 664, 5, 187, "His SIXTH World Cup. Still scoring at 41. The machine does not acknowledge time.", "mmeLCAP74KA"],
+["Kylian Mbappé", "Forward", 12, 14, 1, 50, 92, 2018, 19, 1, 180, 130, 128, 0, 178, "Scored a final hat-trick and LOST. Twelve WC goals at 27 — Klose's record is officially nervous.", "6VC5VHn5EQM"],
+["Neymar", "Forward", 8, 13, 0, 79, 128, 2014, 22, 1, 8, 234, 233, 0, 175, "Brazil's all-time scorer, chasing the one trophy that keeps escaping.", "K2csY1cMpfA"],
+["Harry Kane", "Forward", 8, 11, 0, 73, 108, 2018, 24, 1, 60, 18, 17.5, 0, 188, "2018 Golden Boot; England's record scorer still owes them a star.", "FX3f5tOy350"],
+["Luis Suárez", "Forward", 7, 16, 0, 69, 143, 2010, 23, 1, 2, 38, 37.5, 0, 182, "Goals, bites, and a goal-line handball he would absolutely do again.", "7r0RZikEAKo"],
+["Erling Haaland", "Forward", 0, 0, 0, 40, 45, 2026, 25, 1, 200, 41, 39.5, 0, 195, "Norway's first World Cup since 1998 — the goal robot finally gets the stage.", "EppU7FwAyEc"],
+["Son Heung-min", "Forward", 3, 9, 0, 51, 134, 2014, 21, 1, 15, 15, 14.5, 0, 183, "Asia's superstar on one last World Cup run with the armband.", "b2I2goUwrao"],
+["Vinícius Júnior", "Forward", 1, 5, 0, 30, 46, 2022, 22, 1, 140, 60, 58.5, 0, 176, "The winger Brazil builds 2026 around.", "FrmxHd0llCg"],
+["Julián Álvarez", "Forward", 4, 7, 1, 15, 50, 2022, 22, 1, 100, 19, 18, 0, 170, "Won a World Cup at 22 as the spider who never stops running.", "cD70puReIYk"],
+["Lautaro Martínez", "Forward", 0, 7, 1, 33, 75, 2022, 25, 1, 85, 12, 11.5, 0, 174, "Won 2022 without scoring; has been making up for it ever since.", "caXG53bi7Wg"],
+["Bukayo Saka", "Forward", 3, 6, 0, 13, 50, 2022, 21, 1, 110, 9, 8.5, 0, 178, "From the Euro penalty to England's most dependable spark.", "RUqxAK6lDqs"],
+["Cole Palmer", "Forward", 0, 0, 0, 7, 18, 2026, 24, 1, 100, 12, 11, 0, 185, "Cold Palmer's first World Cup. Ice, meet summer.", "3CFm0dj96sI"],
+["Lamine Yamal", "Forward", 0, 0, 0, 22, 28, 2026, 18, 1, 200, 43, 38, 0, 180, "The face of 2026: eighteen years old and already maybe the best winger alive.", "lACgOT_5zNU"],
+["Nico Williams", "Forward", 0, 2, 0, 9, 35, 2022, 20, 1, 40, 7, 6.4, 0, 181, "Spain's other wing — the fast half of the most fun double act in the sport.", "qayCf_u6n7o"],
+["Désiré Doué", "Forward", 0, 0, 0, 4, 15, 2026, 21, 1, 120, 5, 4.8, 0, 181, "The Champions League final star arrives at his first World Cup.", "VnxHqt75EUM"],
+["Estêvão", "Forward", 0, 0, 0, 6, 16, 2026, 19, 1, 80, 6, 5, 0, 176, "They call him Messinho. Chelsea paid accordingly. First World Cup at 19.", "vzwZYkh9wuw"],
+["Rafael Leão", "Forward", 2, 5, 0, 6, 40, 2022, 23, 1, 50, 9, 8.6, 0, 188, "Two sub goals in Qatar; auditioning for the lead role this time.", "YSFGkJCinU0"],
+["Jérémy Doku", "Forward", 0, 3, 0, 6, 35, 2022, 20, 1, 75, 3.5, 3.4, 0, 173, "Belgium's new wave, dribbling out of the golden generation's shadow.", "6NKYM42Ektc"],
+["Jonathan David", "Forward", 0, 3, 0, 32, 70, 2022, 22, 1, 30, 1, 1, 0, 180, "Canada's quiet scoring machine, hosting the world this time.", "Wu62qkHS15I"],
+["Santiago Giménez", "Forward", 0, 0, 0, 14, 40, 2026, 25, 1, 18, 3, 2.9, 0, 183, "El Bebote — Mexico's hope for a home-soil statement.", "9x-xjGPCiI8"],
+["Diego Maradona", "Midfielder", 8, 21, 1, 34, 91, 1982, 21, 0, 0, 8, 8, 0, 165, "The Hand of God and the Goal of the Century, four minutes apart.", "kVBFXwIKhug"],
+["Zinedine Zidane", "Midfielder", 5, 12, 1, 31, 108, 1998, 25, 0, 0, 44, 44, 1, 185, "Two headers in one final, one headbutt in another. Range.", "GkWNboVtzho"],
+["Ronaldinho", "Midfielder", 3, 10, 1, 33, 97, 2002, 22, 0, 0, 78, 78, 1, 181, "The free kick over Seaman, and the smile that won everyone.", "ADi1A1dX9wA"],
+["Andrés Iniesta", "Midfielder", 2, 13, 1, 13, 131, 2006, 22, 0, 0, 43, 43, 0, 171, "The 116th-minute goal that ended eighty years of waiting.", "muwJQ6VT2w4"],
+["Xavi", "Midfielder", 0, 16, 1, 13, 133, 2002, 22, 0, 0, 9, 9, 0, 170, "Tiki-taka's metronome; the 2010 midfield ran on Xavi time.", "lgGUd4CCX9o"],
+["Toni Kroos", "Midfielder", 3, 16, 1, 17, 114, 2010, 20, 0, 0, 48, 48, 0, 183, "The 7-1 had his fingerprints on it. Retired undefeated against chaos.", "Fr-PZ1utSBY"],
+["Luka Modrić", "Midfielder", 3, 19, 0, 27, 188, 2006, 20, 1, 4, 39, 37.4, 1, 172, "2018 Golden Ball; still conducting at 40 like time is a rumor.", "atReonbrBbk"],
+["Kevin De Bruyne", "Midfielder", 2, 14, 0, 30, 110, 2014, 22, 1, 8, 26, 25, 0, 181, "The golden generation's last ride, now with wiser legs.", "_fXA3gPTlEQ"],
+["Christian Pulisic", "Midfielder", 1, 4, 0, 35, 82, 2022, 24, 1, 40, 5, 4.6, 0, 177, "Captain America hosts the party this time.", "Afbp9d7qty8"],
+["Weston McKennie", "Midfielder", 0, 4, 0, 12, 62, 2022, 24, 1, 30, 2, 1.9, 0, 185, "The USMNT's chaos midfielder, at home in every sense.", "9LvlzMAhkZI"],
+["Rodri", "Midfielder", 0, 5, 0, 9, 62, 2022, 26, 1, 50, 7, 6.6, 1, 191, "Ballon d'Or holder; Spain's tempo lives in his boots.", "aRqbw98YphE"],
+["Jude Bellingham", "Midfielder", 1, 5, 0, 10, 48, 2022, 19, 1, 130, 41, 40, 0, 186, "Hey Jude at 19 in Qatar. 2026 is the coronation attempt.", "BgbtHAnTozE"],
+["Jamal Musiala", "Midfielder", 0, 4, 0, 10, 42, 2022, 19, 1, 100, 6.5, 6.2, 0, 184, "Bambi on espresso — Germany's joy merchant.", "gNRJrH1AQ6g"],
+["Florian Wirtz", "Midfielder", 0, 0, 0, 8, 35, 2026, 23, 1, 100, 4, 3.8, 0, 177, "Germany's conductor-in-waiting, finally on the big podium.", "CSMj6VIPGE8"],
+["Enzo Fernández", "Midfielder", 1, 7, 1, 7, 48, 2022, 21, 1, 90, 12, 11.5, 0, 178, "Best young player of 2022; runs the show like it owes him money.", "sDQBa591DK8"],
+["Alexis Mac Allister", "Midfielder", 1, 7, 1, 10, 52, 2022, 23, 1, 70, 7, 6.7, 0, 174, "The most trustworthy man in Argentina's engine room.", "kP4RWQHD418"],
+["Federico Valverde", "Midfielder", 0, 4, 0, 10, 72, 2022, 24, 1, 90, 22, 20.5, 0, 182, "The Falcon: two lungs, one howitzer of a right foot.", "Ok0wtAhKIU0"],
+["Phil Foden", "Midfielder", 0, 4, 0, 5, 48, 2022, 22, 1, 70, 14, 13.4, 0, 171, "The Stockport Iniesta still waiting for his tournament.", "8gFTy6OYCG4"],
+["Pedri", "Midfielder", 0, 4, 0, 4, 35, 2022, 19, 1, 150, 22, 20.5, 0, 174, "Plays like the ball owes him a favor and always pays up.", "cgYfkDXiLBU"],
+["Gavi", "Midfielder", 1, 5, 0, 6, 35, 2022, 18, 1, 30, 12, 11, 0, 173, "Scored in a World Cup at 18 — Spain's snarling heartbeat.", "E5uV8Ax12EU"],
+["Warren Zaïre-Emery", "Midfielder", 0, 0, 0, 2, 12, 2026, 20, 1, 80, 2.5, 2.4, 0, 178, "PSG's homegrown engine, World Cup debut at 20.", "LVZajTuWZHE"],
+["Aurélien Tchouaméni", "Midfielder", 1, 6, 0, 5, 45, 2022, 22, 1, 70, 4.5, 4.3, 0, 187, "Scored against England in a quarterfinal and barely celebrated. Business.", "2tnWjmh-VwA"],
+["Bruno Fernandes", "Midfielder", 2, 10, 0, 26, 82, 2018, 23, 1, 35, 15, 14.4, 0, 179, "Portugal's penalty-box telepath.", "DTxLMavV42w"],
+["Takefusa Kubo", "Midfielder", 0, 2, 0, 6, 48, 2022, 21, 1, 20, 4, 3.8, 0, 173, "Japan's jewel — Real Madrid raised him, the Samurai Blue deploy him.", "tKtZSXAWmdE"],
+["Franco Mastantuono", "Midfielder", 0, 0, 0, 2, 10, 2026, 18, 1, 45, 3, 2.2, 0, 178, "Real Madrid paid for the future; Argentina cashes the check now.", "gTBXNdMvfG0"],
+["Martin Ødegaard", "Midfielder", 0, 0, 0, 11, 68, 2026, 27, 1, 65, 9, 8.6, 0, 178, "Twelve years famous, zero World Cups — until now.", "zZjdyKqXTwE"],
+["Cafu", "Defender", 0, 16, 2, 5, 142, 1994, 23, 0, 0, 2, 2, 0, 176, "Played in three consecutive World Cup finals. The only one ever.", "jql4LqAdFWA"],
+["Paolo Maldini", "Defender", 0, 23, 0, 7, 126, 1990, 21, 0, 0, 6, 6, 0, 186, "Twenty-three World Cup matches of pure elegance, zero titles. Cruel sport.", "_vJb-ag2a6s"],
+["Franz Beckenbauer", "Defender", 5, 18, 1, 14, 103, 1966, 20, 0, 0, 0, 0, 2, 181, "Won it as captain, won it as coach, invented a position in between.", "SvczggHIzMU"],
+["Théo Hernandez", "Defender", 1, 6, 0, 2, 42, 2022, 25, 1, 20, 8, 7.7, 0, 184, "Scored in a World Cup semifinal from left back. Normal stuff.", "RyMQi4ox9a4"],
+["William Saliba", "Defender", 0, 2, 0, 0, 30, 2022, 21, 1, 100, 5, 4.8, 0, 192, "France's calmest human; attackers bounce off the serenity.", "m82wkBfqOXI"],
+["Achraf Hakimi", "Defender", 0, 10, 0, 11, 92, 2018, 19, 1, 80, 24, 23, 0, 181, "The 2022 semifinal run's right flank; the panenka against Spain lives forever.", "MEfr6x6OPd4"],
+["Alphonso Davies", "Defender", 1, 3, 0, 16, 60, 2022, 22, 1, 40, 6.5, 6.2, 0, 183, "Scored Canada's first-ever World Cup goal. Now he's hosting.", "eL6-vT2ikOo"],
+["Pau Cubarsí", "Defender", 0, 0, 0, 1, 16, 2026, 19, 1, 80, 4, 3.2, 0, 184, "Reads the game like a thirty-year-old. Is nineteen.", "iVQIVNaIdW4"],
+["Lev Yashin", "Goalkeeper", 0, 12, 0, 0, 74, 1958, 28, 0, 0, 0, 0, 1, 189, "The Black Spider — still the only goalkeeper to win the Ballon d'Or.", "YCR3mAbXao8"],
+["Gianluigi Buffon", "Goalkeeper", 0, 17, 1, 0, 176, 1998, 20, 0, 0, 11, 11, 0, 192, "2006: five clean sheets and a wall where the goal used to be.", "7Y03hAXQ-Oc"],
+["Manuel Neuer", "Goalkeeper", 0, 18, 1, 0, 124, 2010, 24, 0, 2, 14, 14, 0, 193, "The sweeper-keeper blueprint; redefined where a goalkeeper ends.", "pbsNA_6b8tM"],
+["Emiliano Martínez", "Goalkeeper", 0, 7, 1, 0, 52, 2022, 30, 1, 12, 14, 13.4, 0, 195, "The dark arts in gloves; 2022's decisive paw.", "eV52-Sotw90"],
+["Alisson", "Goalkeeper", 0, 9, 0, 0, 70, 2018, 25, 1, 15, 9, 8.6, 0, 193, "Brazil's calm in goal — order behind the jogo bonito.", "_rB71BAE0p4"],
+["Thibaut Courtois", "Goalkeeper", 0, 14, 0, 0, 102, 2014, 22, 1, 15, 17, 16.3, 0, 200, "Best keeper of 2018; two meters of bad news for strikers.", "g3hqudgOguU"],
+["Ousmane Dembélé", "Forward", 1, 8, 1, 6, 55, 2018, 21, 1, 90, 14, 13.5, 1, 178, "PSG's treble talisman — no longer the wildcard, finally the headline.", ""],
+["Michael Olise", "Forward", 0, 0, 0, 5, 18, 2026, 24, 1, 110, 4, 3.2, 0, 184, "Bayern's creator handed France's right wing on his World Cup debut.", ""],
+["Mohamed Salah", "Forward", 2, 3, 0, 60, 105, 2018, 26, 1, 45, 65.4, 64, 0, 175, "The Egyptian King's first World Cup since 2018 — 65 million followers want a coronation.", ""],
+["Raphinha", "Forward", 0, 4, 0, 14, 45, 2022, 25, 1, 100, 18, 16.5, 0, 176, "Barcelona's relentless winger, finally Brazil's main man up top.", ""],
+["Alexander Isak", "Forward", 0, 0, 0, 16, 50, 2026, 26, 1, 120, 5, 4.5, 0, 192, "Sweden's silk-and-steel striker, a World Cup debut after a record move.", ""],
+["Luis Díaz", "Forward", 0, 0, 0, 20, 60, 2026, 29, 1, 80, 9, 8.5, 0, 180, "Colombia's live wire — Lucho brings the carnival to North America.", ""],
+["Marcus Thuram", "Forward", 0, 3, 0, 6, 30, 2022, 25, 1, 70, 3, 2.8, 0, 192, "Inter's wrecking ball, carrying the Thuram name into a new generation.", ""],
+["Rayan Cherki", "Forward", 0, 0, 0, 3, 8, 2026, 22, 1, 90, 4, 2.5, 0, 176, "City's trickster, France's newest magician — first World Cup at 22.", ""],
+["Antoine Semenyo", "Forward", 0, 0, 0, 8, 30, 2026, 26, 1, 70, 1.5, 0.8, 0, 177, "Bournemouth's bulldozer — Ghana's breakout hope for a deep run.", ""],
+["Viktor Gyökeres", "Forward", 0, 0, 0, 14, 30, 2026, 28, 1, 75, 3, 2.5, 0, 189, "The goal machine who terrorized Europe, now on the world's biggest stage.", ""],
+["Kai Havertz", "Forward", 0, 0, 0, 18, 50, 2022, 23, 1, 70, 7, 6.5, 0, 193, "Germany's elegant nine — the man for the big-final moment.", ""],
+["Cody Gakpo", "Forward", 3, 5, 0, 12, 40, 2022, 23, 1, 75, 6, 5.5, 0, 189, "Three goals in Qatar; Liverpool's Dutchman wants more.", ""],
+["Gabriel Martinelli", "Forward", 0, 3, 0, 5, 30, 2022, 21, 1, 60, 9, 8.5, 0, 178, "Arsenal's blur of pace, Brazil's super-sub turned starter.", ""],
+["Gonçalo Ramos", "Forward", 3, 4, 0, 9, 30, 2022, 21, 1, 65, 5, 4.5, 0, 185, "Hat-trick off the bench in Qatar; the man who benched Ronaldo, briefly.", ""],
+["Raúl Jiménez", "Forward", 1, 7, 0, 40, 100, 2018, 27, 1, 12, 5, 4.8, 0, 190, "Mexico's veteran spear, leading the line on home-ish soil.", ""],
+["Kenan Yıldız", "Forward", 0, 0, 0, 6, 20, 2026, 21, 1, 90, 6, 4.5, 0, 185, "Juventus's number ten — Türkiye's first World Cup since 2002 has a face.", ""],
+["Kaoru Mitoma", "Forward", 0, 4, 0, 8, 35, 2022, 25, 1, 50, 4, 3.5, 0, 178, "Japan's dribble-physics PhD — the millimetre cross of 2022 was just the start.", ""],
+["Sadio Mané", "Forward", 0, 3, 0, 45, 110, 2018, 26, 1, 20, 14, 13.5, 0, 175, "Senegal's talisman, chasing the run his country's golden age deserves.", ""],
+["Endrick", "Forward", 0, 0, 0, 4, 12, 2026, 19, 1, 70, 12, 10.5, 0, 173, "Real Madrid's teen jewel — already a viral sensation before his first World Cup kick.", ""],
+["Julián Quiñones", "Forward", 0, 0, 0, 6, 18, 2026, 28, 1, 15, 1.4, 1, 0, 178, "Scored against South Africa and gained 376,000 followers overnight — host-nation folklore in real time.", ""],
+["Yan Diomande", "Forward", 0, 0, 0, 2, 6, 2026, 19, 1, 40, 0.9, 0.3, 0, 175, "Leipzig's teenage flyer — a wonderkid whose following tripled the week the world tuned in.", ""],
+["Vitinha", "Midfielder", 0, 2, 0, 4, 30, 2022, 22, 1, 90, 5, 4.5, 0, 172, "PSG's metronome — the quiet engine of a Champions League machine.", ""],
+["Bruno Guimarães", "Midfielder", 0, 3, 0, 4, 40, 2022, 24, 1, 80, 6, 5.5, 0, 182, "Newcastle's heartbeat, Brazil's tackle-and-pass midfield general.", ""],
+["João Neves", "Midfielder", 0, 0, 0, 2, 18, 2026, 21, 1, 110, 4, 3, 0, 174, "PSG's all-action 21-year-old — Portugal's future arriving early.", ""],
+["Moisés Caicedo", "Midfielder", 0, 3, 0, 4, 45, 2022, 20, 1, 100, 4, 3.5, 0, 178, "Chelsea's £115M destroyer — Ecuador's shield and spine.", ""],
+["Declan Rice", "Midfielder", 0, 5, 0, 6, 60, 2022, 23, 1, 110, 9, 8.5, 0, 188, "Arsenal's set-piece superweapon and England's unbudgeable base.", ""],
+["Joshua Kimmich", "Midfielder", 0, 9, 0, 8, 100, 2018, 23, 1, 50, 6, 5.5, 0, 177, "Germany's Swiss-army captain — right back, six, whatever the team needs.", ""],
+["Casemiro", "Midfielder", 1, 12, 0, 9, 75, 2018, 26, 1, 15, 30, 29, 0, 185, "The shield in front of Brazil's defence — still breaking up attacks at 34.", ""],
+["Bernardo Silva", "Midfielder", 0, 10, 0, 12, 95, 2018, 23, 1, 50, 12, 11.5, 0, 173, "City's silk — does the work of three and makes it look like a stroll.", ""],
+["Frenkie de Jong", "Midfielder", 0, 5, 0, 3, 60, 2022, 25, 1, 70, 9, 8.5, 0, 180, "Barcelona's glide-past-everyone midfielder, finally fit for a tournament.", ""],
+["Martín Zubimendi", "Midfielder", 0, 0, 0, 2, 20, 2026, 27, 1, 70, 2, 1.6, 0, 181, "Arsenal's positional metronome — the unglamorous reason Spain hum.", ""],
+["Tijjani Reijnders", "Midfielder", 0, 0, 0, 4, 25, 2026, 27, 1, 70, 3, 2.5, 0, 185, "City's box-to-box surge, the Netherlands' new midfield engine.", ""],
+["N'Golo Kanté", "Midfielder", 0, 7, 1, 2, 60, 2018, 27, 1, 20, 11, 10.8, 0, 168, "Won the world in 2018, vanished into space to win the ball back. Back again.", ""],
+["Scott McTominay", "Midfielder", 0, 0, 0, 12, 60, 2026, 29, 1, 45, 3, 2.3, 0, 193, "Napoli's Scudetto hero dragging Scotland to a rare World Cup.", ""],
+["Mikel Merino", "Midfielder", 0, 0, 0, 5, 30, 2026, 30, 1, 50, 1.5, 1.2, 0, 188, "Arsenal's emergency-striker-turned-Spain's-midfield Swiss army knife.", ""],
+["Arda Güler", "Midfielder", 0, 0, 0, 6, 25, 2026, 21, 1, 90, 7, 5, 0, 176, "Real Madrid's left foot from another century — Türkiye's golden boy.", ""],
+["Fermín López", "Midfielder", 0, 0, 0, 4, 15, 2026, 23, 1, 70, 3, 2.2, 0, 179, "Barcelona's big-game midfielder — arrives whenever the lights are brightest.", ""],
+["Virgil van Dijk", "Defender", 0, 5, 0, 9, 80, 2022, 31, 1, 30, 14, 13.5, 0, 195, "The Netherlands' colossus and captain — calm is a tactic.", ""],
+["Marquinhos", "Defender", 0, 11, 0, 7, 90, 2018, 24, 1, 30, 9, 8.5, 0, 183, "Brazil's defensive anchor across three World Cups, chasing the missing star.", ""],
+["Gabriel Magalhães", "Defender", 0, 0, 0, 3, 30, 2026, 28, 1, 75, 5, 4.2, 0, 190, "Arsenal's set-piece cheat code — Brazil's new wall.", ""],
+["Joško Gvardiol", "Defender", 0, 7, 0, 4, 40, 2022, 20, 1, 90, 6, 5.5, 0, 185, "City's ball-playing tank — the best left-sided defender of his generation.", ""],
+["Jules Koundé", "Defender", 0, 6, 1, 1, 40, 2022, 23, 1, 60, 6, 5.5, 0, 178, "Barcelona's right back with a centre back's steel and a stylist's wardrobe.", ""],
+["Nuno Mendes", "Defender", 0, 3, 0, 1, 30, 2022, 20, 1, 80, 4, 3.5, 0, 177, "PSG's afterburner left back — locked up the best wingers in Europe.", ""],
+["Rúben Dias", "Defender", 0, 5, 0, 2, 60, 2022, 25, 1, 75, 7, 6.5, 0, 187, "City's organizer-in-chief — Portugal's back line runs on his voice.", ""],
+["Antonio Rüdiger", "Defender", 0, 8, 0, 4, 75, 2018, 25, 1, 35, 9, 8.5, 0, 190, "Real Madrid's chaos enforcer — strikers leave with a story and a bruise.", ""],
+["Denzel Dumfries", "Defender", 0, 5, 0, 8, 55, 2022, 26, 1, 45, 3, 2.7, 0, 188, "Inter's runaway-train wing back — Oranje's relentless right flank.", ""],
+["Marc Cucurella", "Defender", 0, 0, 0, 1, 25, 2026, 27, 1, 55, 3, 2.5, 0, 172, "Chelsea's curly-haired menace — Spain's combative left side.", ""],
+["Willian Pacho", "Defender", 0, 0, 0, 2, 35, 2026, 24, 1, 70, 1.5, 1, 0, 188, "PSG's unbeaten-season rock — Ecuador's quietly elite centre back.", ""],
+["João Cancelo", "Defender", 0, 3, 0, 10, 55, 2022, 28, 1, 35, 8, 7.5, 0, 182, "A full back on both flanks and a playmaker on neither — Portugal's luxury.", ""],
+["Kim Min-jae", "Defender", 0, 4, 0, 4, 65, 2022, 25, 1, 45, 4, 3.5, 0, 190, "The Monster — Bayern's centre back anchoring Korea's back line.", ""],
+["Lisandro Martínez", "Defender", 0, 6, 1, 1, 35, 2022, 24, 1, 45, 6, 5.5, 0, 175, "The Butcher — 175cm of pure refusal, a World Cup winner who fears no striker.", ""],
+["Mike Maignan", "Goalkeeper", 0, 0, 0, 0, 30, 2026, 30, 1, 35, 4, 3.5, 0, 191, "Milan's commanding keeper — France's post-Lloris last line.", ""],
+["Vozinha", "Goalkeeper", 0, 0, 0, 0, 40, 2026, 33, 1, 1, 6.8, 0.03, 0, 190, "Cape Verde's first-ever World Cup keeper — 31,000 followers to nearly 7 million in a week. The tournament's biggest social-media earthquake.", ""],
+["Unai Simón", "Goalkeeper", 0, 4, 0, 0, 45, 2022, 25, 1, 25, 2, 1.7, 0, 190, "Spain's ball-playing keeper — sweeper of the tiki-taka revival.", ""],
+["Yann Sommer", "Goalkeeper", 0, 4, 0, 0, 95, 2018, 29, 1, 8, 2, 1.8, 0, 183, "Inter's unbeatable wall — Switzerland's evergreen number one.", ""]
 ];
 
+// current club (2025–26 season); legends marked with their iconic side
+const CLUBS = {
+  "Pelé": "Santos (legend)", "Ronaldo Nazário": "Real Madrid (legend)", "Miroslav Klose": "Lazio (retired)",
+  "Gerd Müller": "Bayern Munich (legend)", "Just Fontaine": "Reims (legend)", "Thomas Müller": "Vancouver Whitecaps",
+  "Lionel Messi": "Inter Miami", "Cristiano Ronaldo": "Al Nassr", "Kylian Mbappé": "Real Madrid",
+  "Neymar": "Santos", "Harry Kane": "Bayern Munich", "Luis Suárez": "Inter Miami",
+  "Erling Haaland": "Manchester City", "Son Heung-min": "LAFC", "Vinícius Júnior": "Real Madrid",
+  "Julián Álvarez": "Atlético Madrid", "Lautaro Martínez": "Inter", "Bukayo Saka": "Arsenal",
+  "Cole Palmer": "Chelsea", "Lamine Yamal": "Barcelona", "Nico Williams": "Athletic Club",
+  "Désiré Doué": "Paris Saint-Germain", "Estêvão": "Chelsea", "Rafael Leão": "AC Milan",
+  "Jérémy Doku": "Manchester City", "Jonathan David": "Juventus", "Santiago Giménez": "AC Milan",
+  "Diego Maradona": "Napoli (legend)", "Zinedine Zidane": "Real Madrid (legend)", "Ronaldinho": "Barcelona (legend)",
+  "Andrés Iniesta": "Barcelona (retired)", "Xavi": "Barcelona (legend)", "Toni Kroos": "Real Madrid (retired)",
+  "Luka Modrić": "AC Milan", "Kevin De Bruyne": "Napoli", "Christian Pulisic": "AC Milan",
+  "Weston McKennie": "Juventus", "Rodri": "Manchester City", "Jude Bellingham": "Real Madrid",
+  "Jamal Musiala": "Bayern Munich", "Florian Wirtz": "Liverpool", "Enzo Fernández": "Chelsea",
+  "Alexis Mac Allister": "Liverpool", "Federico Valverde": "Real Madrid", "Phil Foden": "Manchester City",
+  "Pedri": "Barcelona", "Gavi": "Barcelona", "Warren Zaïre-Emery": "Paris Saint-Germain",
+  "Aurélien Tchouaméni": "Real Madrid", "Bruno Fernandes": "Manchester United", "Takefusa Kubo": "Real Sociedad",
+  "Franco Mastantuono": "Real Madrid", "Martin Ødegaard": "Arsenal", "Cafu": "AC Milan (legend)",
+  "Paolo Maldini": "AC Milan (legend)", "Franz Beckenbauer": "Bayern Munich (legend)", "Théo Hernandez": "Al-Hilal",
+  "William Saliba": "Arsenal", "Achraf Hakimi": "Paris Saint-Germain", "Alphonso Davies": "Bayern Munich",
+  "Pau Cubarsí": "Barcelona", "Lev Yashin": "Dynamo Moscow (legend)", "Gianluigi Buffon": "Juventus (retired)",
+  "Manuel Neuer": "Bayern Munich", "Emiliano Martínez": "Aston Villa", "Alisson": "Liverpool",
+  "Thibaut Courtois": "Real Madrid", "Ousmane Dembélé": "Paris Saint-Germain", "Michael Olise": "Bayern Munich",
+  "Mohamed Salah": "Liverpool", "Raphinha": "Barcelona", "Alexander Isak": "Liverpool",
+  "Luis Díaz": "Bayern Munich", "Marcus Thuram": "Inter", "Rayan Cherki": "Manchester City",
+  "Antoine Semenyo": "Bournemouth", "Viktor Gyökeres": "Arsenal", "Kai Havertz": "Arsenal",
+  "Cody Gakpo": "Liverpool", "Gabriel Martinelli": "Arsenal", "Gonçalo Ramos": "Paris Saint-Germain",
+  "Raúl Jiménez": "Fulham", "Kenan Yıldız": "Juventus", "Kaoru Mitoma": "Brighton",
+  "Sadio Mané": "Al Nassr", "Endrick": "Real Madrid", "Julián Quiñones": "Al-Qadsiah",
+  "Yan Diomande": "RB Leipzig", "Vitinha": "Paris Saint-Germain", "Bruno Guimarães": "Newcastle United",
+  "João Neves": "Paris Saint-Germain", "Moisés Caicedo": "Chelsea", "Declan Rice": "Arsenal",
+  "Joshua Kimmich": "Bayern Munich", "Casemiro": "Manchester United", "Bernardo Silva": "Manchester City",
+  "Frenkie de Jong": "Barcelona", "Martín Zubimendi": "Arsenal", "Tijjani Reijnders": "Manchester City",
+  "N'Golo Kanté": "Al-Ittihad", "Scott McTominay": "Napoli", "Mikel Merino": "Arsenal",
+  "Arda Güler": "Real Madrid", "Fermín López": "Barcelona", "Virgil van Dijk": "Liverpool",
+  "Marquinhos": "Paris Saint-Germain", "Gabriel Magalhães": "Arsenal", "Joško Gvardiol": "Manchester City",
+  "Jules Koundé": "Barcelona", "Nuno Mendes": "Paris Saint-Germain", "Rúben Dias": "Manchester City",
+  "Antonio Rüdiger": "Real Madrid", "Denzel Dumfries": "Inter", "Marc Cucurella": "Chelsea",
+  "Willian Pacho": "Paris Saint-Germain", "João Cancelo": "Al-Hilal", "Kim Min-jae": "Bayern Munich",
+  "Lisandro Martínez": "Manchester United", "Mike Maignan": "AC Milan", "Vozinha": "Cape Verde NT",
+  "Unai Simón": "Athletic Club", "Yann Sommer": "Inter",
+};
+// current age = age at first World Cup + years since; legends no longer with us show birth–death
+const DECEASED = {
+  "Pelé": "1940–2022", "Diego Maradona": "1960–2020", "Just Fontaine": "1933–2023",
+  "Gerd Müller": "1945–2021", "Franz Beckenbauer": "1945–2024", "Lev Yashin": "1929–1990",
+};
+const ageOf = s => DECEASED[s.title] ? "✝ " + DECEASED[s.title] : "🎂 " + (s.agefV + (2026 - s.firstWC)) + " yrs";
+
 // ---------------- state ----------------
-let metricX = METRICS[6]; // First WC
-let metricY = METRICS[0]; // WC Goals
+let metricX = METRICS[0]; // Insta Boom
+let metricY = METRICS[1]; // Insta Followers
 const off = new Set();
 const stage = document.getElementById("stage");
 const tip = document.getElementById("tip");
@@ -602,20 +729,30 @@ const TOUCH = matchMedia("(hover: none), (pointer: coarse)").matches;
 
 const songs = SONGS.map((p, i) => ({
   title: p[0], album: p[1], wcgV: p[2], wcmV: p[3], titlesV: p[4], intlV: p[5], capsV: p[6],
-  firstWC: p[7], agefV: p[8], now: p[9], priceV: p[10], instaV: p[11], ballonV: p[12], htV: p[13],
-  note: p[14], yt: p[15],
-  gpmV: p[3] ? p[2] / p[3] : 0, id: i
+  firstWC: p[7], agefV: p[8], now: p[9], priceV: p[10], instaV: p[11], instaBeforeV: p[12],
+  ballonV: p[13], htV: p[14], note: p[15], yt: p[16],
+  gpmV: p[3] ? p[2] / p[3] : 0,
+  // Instagram growth since kickoff (before → today), as a percentage
+  boomV: p[12] > 0 ? (p[11] - p[12]) / p[12] * 100 : 0, id: i
 }));
-// raw stats normalized to 0–100 for plotting; tooltips show the real values
-const norm = (get, k) => {
-  const vs = songs.map(get), lo = Math.min(...vs), hi = Math.max(...vs);
-  songs.forEach(s => s[k] = Math.round((get(s) - lo) / (hi - lo) * 100));
+const fmtInsta = v => v >= 1 ? (Math.round(v * 10) / 10) + "M" : Math.round(v * 1000) + "K";
+// compact number formatter for axis ticks (followers / € millions): 665, 25, 4.1, 0.4
+const fmtNum = v => v >= 10 ? Math.round(v) : v >= 1 ? Math.round(v * 10) / 10 : Math.round(v * 100) / 100;
+// each metric normalized to 0–100 for plotting; log-scaled where the spread is exponential.
+// raw bounds are stashed on the metric so valueAt() can print real numbers on the axes.
+const Lg = x => Math.log10(1 + Math.max(0, x));
+METRICS.forEach(m => {
+  const vs = songs.map(m.raw);
+  m._lo = Math.min(...vs); m._hi = Math.max(...vs);
+  const lo = m.log ? Lg(m._lo) : m._lo, hi = m.log ? Lg(m._hi) : m._hi, span = (hi - lo) || 1;
+  songs.forEach(s => { const t = m.log ? Lg(m.raw(s)) : m.raw(s); s[m.k] = Math.round((t - lo) / span * 100); });
+});
+// real metric value at a normalized axis position (0–100) — inverts the scale for tick labels
+const valueAt = (m, t) => {
+  const lo = m.log ? Lg(m._lo) : m._lo, hi = m.log ? Lg(m._hi) : m._hi;
+  const y = lo + (t / 100) * (hi - lo);
+  return m.log ? Math.pow(10, y) - 1 : y;
 };
-norm(s => s.wcgV, "wcg"); norm(s => s.wcmV, "wcm"); norm(s => s.gpmV, "gpm");
-norm(s => s.titlesV, "titles"); norm(s => s.intlV, "intl"); norm(s => s.capsV, "caps");
-norm(s => s.firstWC, "rel"); norm(s => s.agefV, "agef");
-norm(s => s.priceV, "price"); norm(s => s.instaV, "insta");
-norm(s => s.ballonV, "ballon"); norm(s => s.htV, "height");
 const disp = (s, m) =>
   m.k === "wcg" ? s.wcgV + (s.wcgV === 1 ? " goal" : " goals") : m.k === "wcm" ? s.wcmV + " matches" :
   m.k === "gpm" ? (s.wcmV ? s.gpmV.toFixed(2) + "/match" : "—") :
@@ -623,7 +760,8 @@ const disp = (s, m) =>
   m.k === "intl" ? s.intlV + " goals" : m.k === "caps" ? s.capsV + " caps" :
   m.k === "rel" ? s.firstWC : m.k === "agef" ? s.agefV + " yrs" :
   m.k === "price" ? (s.priceV ? "€" + s.priceV + "M" : "—") :
-  m.k === "insta" ? (s.instaV >= 1 ? s.instaV + "M" : Math.round(s.instaV * 1000) + "K") :
+  m.k === "insta" ? fmtInsta(s.instaV) :
+  m.k === "boom" ? (s.boomV ? "+" + Math.round(s.boomV).toLocaleString() + "%" : "—") :
   m.k === "ballon" ? (s.ballonV ? "🏆".repeat(s.ballonV) : "0") :
   m.k === "height" ? s.htV + " cm" : s[m.k];
 
@@ -730,10 +868,12 @@ function showTip(el, s) {
       <div>
         <div class="t-title">${s.title}</div>
         <div class="t-album" style="color:${a.c}">${s.album} · ${s.now ? "⭐ at the 2026 World Cup" : a.y}</div>
+        <div class="t-club">🏟️ ${CLUBS[s.title] || "—"} &nbsp;·&nbsp; ${ageOf(s)}</div>
       </div>
     </div>
     <div class="t-metric">→ ${metricX.label}: <span class="t-score">${disp(s, metricX)}</span> &nbsp;·&nbsp; ↑ ${metricY.label}: <span class="t-score">${disp(s, metricY)}</span></div>
     <div class="t-note">${s.note}</div>
+    ${s.now ? `<div class="t-metric">📸 Insta: ${fmtInsta(s.instaBeforeV)} <span style="opacity:.6">before WC</span> → ${fmtInsta(s.instaV)} <span style="opacity:.6">today</span> &nbsp;<span class="t-score">${s.boomV ? "+" + Math.round(s.boomV).toLocaleString() + "%" : "±0%"}</span></div>` : ""}
     <div class="t-actions">
       <a class="t-play yt" href="${s.yt ? "https://www.youtube.com/watch?v=" + s.yt : "https://www.youtube.com/results?search_query=" + encodeURIComponent(s.title + " football highlights")}" target="_blank">▶ Highlights</a>
       <a class="t-play bref" href="https://fbref.com/en/search/search.fcgi?search=${encodeURIComponent(s.title)}" target="_blank">📊 Career stats</a>
@@ -788,6 +928,10 @@ function render(relayout = true) {
   corners[3].textContent = metricX.hi + " · " + metricY.lo;
   coversEl.querySelectorAll("[data-album]").forEach(c =>
     c.classList.toggle("solo", !off.has(c.dataset.album) && off.size === Object.keys(ALBUMS).length - 1));
+
+  // number the axes with the real metric value at each gridline (log-aware)
+  stage.querySelectorAll(".gridtick").forEach(t => t.textContent = metricX.fmt(valueAt(metricX, +t.dataset.v)));
+  stage.querySelectorAll(".gridtickY").forEach(t => t.textContent = metricY.fmt(valueAt(metricY, +t.dataset.v)));
 
   const pos = layout();
   songs.forEach((s, i) => {

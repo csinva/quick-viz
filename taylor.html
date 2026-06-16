@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Swiftie Spectrum — every era, every feeling</title>
+<title>The Swiftie Deep-Dive — every era, every feeling</title>
 <style>
   :root {
     --bg: #0d0b14;
@@ -401,16 +401,16 @@
 </style>
 </head>
 <body>
-<a class="home-btn" href="index.html" title="Back to The Spectra">⌂ Home</a>
+<a class="home-btn" href="index.html" title="Back to deep-dive">⌂ Home</a>
 <div class="made-by">Made with love by <a href="https://x.com/csinva" target="_blank" rel="noopener">@csinva</a></div>
 <div class="wrap">
   <header>
-    <h1>The Swiftie Spectrum</h1>
+    <h1>The Swiftie Deep-Dive</h1>
     <div class="sub"><b>252 songs</b>. Pick one metric per axis, filter by album, and hover by dot for song details.</div>
   </header>
 
   <nav class="tabs">
-    <button class="tab active" data-page="spectrum">🌌 The Spectrum</button>
+    <button class="tab active" data-page="spectrum">🌌 The Deep-Dive</button>
     <button class="tab" data-page="aura">🔮 Your Aura</button>
   </nav>
 
@@ -810,6 +810,19 @@ const fmtDate = d => MO[+d.split("-")[1] - 1] + " " + d.split("-")[0];
 const fmtTrend = d => { const wk = d * 7; return wk >= 1e6 ? (wk / 1e6).toFixed(1) + "M/wk" : Math.round(wk / 1e3) + "K/wk"; };
 const disp = (s, m) => m.k === "len" ? fmtLen(s.sec) : m.k === "pop" ? fmtSt(s.streams)
   : m.k === "trend" ? fmtTrend(s.daily) : m.k === "rel" ? fmtDate(s.date) : s[m.k];
+// real-valued axes: print actual numbers at each gridline (inverting each metric's scale).
+// annotated 0–100 scores keep their plain score ticks.
+const fmtDateTs = t => { const d = new Date(t); return MO[d.getMonth()] + " " + d.getFullYear(); };
+const AXIS = {
+  len:   { lo: minSec, hi: maxSec, log: false, fmt: v => fmtLen(Math.round(v)) },
+  pop:   { lo: minSt,  hi: maxSt,  log: true,  fmt: v => fmtSt(v) },
+  trend: { lo: minD,   hi: maxD,   log: true,  fmt: v => fmtTrend(v) },
+  rel:   { lo: minT,   hi: maxT,   log: false, fmt: v => fmtDateTs(v) },
+};
+const valueAt = (c, t) => c.log
+  ? Math.pow(10, lg(c.lo) + (t / 100) * (lg(c.hi) - lg(c.lo)))
+  : c.lo + (t / 100) * (c.hi - c.lo);
+const tickLabel = (m, v) => AXIS[m.k] ? AXIS[m.k].fmt(valueAt(AXIS[m.k], v)) : v;
 
 // ---------------- build UI ----------------
 function soloAlbum(name) {
@@ -982,6 +995,9 @@ function render(relayout = true) {
   corners[3].textContent = metricX.hi + " · " + metricY.lo;
   coversEl.querySelectorAll("img").forEach(c =>
     c.classList.toggle("solo", !off.has(c.dataset.album) && off.size === Object.keys(ALBUMS).length - 1));
+  // number the axes with real values where the metric is a real measurement
+  stage.querySelectorAll(".gridtick").forEach(t => t.textContent = tickLabel(metricX, +t.dataset.v));
+  stage.querySelectorAll(".gridtickY").forEach(t => t.textContent = tickLabel(metricY, +t.dataset.v));
 
   const pos = layout();
   songs.forEach((s, i) => {
